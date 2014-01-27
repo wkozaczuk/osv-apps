@@ -1,0 +1,12 @@
+#!/bin/sh
+
+YEAR=2013
+VERSION=3080200
+
+mkdir upstream
+cd upstream
+wget http://www.sqlite.org/$YEAR/sqlite-amalgamation-$VERSION.zip
+unzip -x sqlite-amalgamation-$VERSION.zip
+cd -
+
+cc -O2 -fPIC -Wall -shared -DHAVE_MREMAP=0 -o sqlite.so upstream/sqlite-amalgamation-$VERSION/*.c
