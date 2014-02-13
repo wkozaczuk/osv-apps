@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e
 MAJOR=7
 VERSION=${MAJOR}.0.42
