@@ -1,0 +1,28 @@
+From 51a02c65793bcc15be484b19c20a807cf6dc954f Mon Sep 17 00:00:00 2001
+Message-Id: <51a02c65793bcc15be484b19c20a807cf6dc954f.1394978410.git.avi@cloudius-systems.com>
+From: Avi Kivity <avi@cloudius-systems.com>
+Date: Sun, 16 Mar 2014 15:58:34 +0200
+Subject: [PATCH] Add script managment role to tomcat user
+
+The manual recommends against having the same user having both gui and script
+roles, but since the user/password is well-known, it doesn't matter here.
+
+Signed-off-by: Avi Kivity <avi@cloudius-systems.com>
+---
+ conf/tomcat-users.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/tomcat-users.xml b/conf/tomcat-users.xml
+index bcf840a..aad3acb 100644
+--- a/conf/tomcat-users.xml
++++ b/conf/tomcat-users.xml
+@@ -27,5 +27,5 @@
+   <!.. ..> that surrounds them.
+ -->
+   <role rolename="tomcat"/>
+-  <user username="tomcat" password="tomcat" roles="manager-gui,admin-gui"/>
++  <user username="tomcat" password="tomcat" roles="manager-gui,admin-gui,manager-script"/>
+ </tomcat-users>
+-- 
+1.8.5.3
+
