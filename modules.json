@@ -50,5 +50,9 @@
 "openjdk8": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/openjdk8/"
+},
+"osv-memcached": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/osv-memcached/"
 }
 }
