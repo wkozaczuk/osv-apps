@@ -54,5 +54,9 @@
 "osv-memcached": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/osv-memcached/"
+},
+"fsmark" : {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/fsmark/"
 }
 }
