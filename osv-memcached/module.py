@@ -7,4 +7,4 @@
 
 from osv.modules import api
 
-default = api.run('/tools/osv-memcached.so -m 1024')
+default = api.run('/tools/osv-memcached.so')
