@@ -24,16 +24,17 @@ TARGET = $(src_dir)/osv-memcached.so
 
 module: $(TARGET)
 
-$(TARGET):
+$(src_dir):
+	git clone $(git_url)
+
+$(TARGET): $(src_dir)
 ifeq ($(OSV_BUILD_PATH),)
 	@echo "OSV_BUILD_PATH not defined!"
 	exit 1
 endif
-	$(MAKE) clean
-	git clone $(git_url)
 	$(MAKE) -C $(src_dir) OSV_PATH=../../.. MODE=$(mode) ARCH=$(arch)
 
 clean:
 	rm -rf $(src_dir)
 
-.PHONY: clean module
+.PHONY: clean module $(TARGET)
