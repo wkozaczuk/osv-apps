@@ -58,5 +58,9 @@
 "fsmark" : {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/fsmark/"
+},
+"jetty" : {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/jetty/"
 }
 }
