@@ -62,5 +62,9 @@
 "jetty" : {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/jetty/"
+},
+"java-example": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/java-example/"
 }
 }
