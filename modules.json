@@ -66,5 +66,9 @@
 "java-example": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/java-example/"
+},
+"leveldb" : {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/leveldb/"
 }
 }
