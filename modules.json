@@ -79,6 +79,10 @@
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/leveldb/"
 },
+"oracle-nosql-db" : {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/oracle-nosql-db/"
+},
 "scala": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/scala/"
