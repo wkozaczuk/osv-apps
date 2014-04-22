@@ -19,13 +19,15 @@ mode := $(notdir $(OSV_BUILD_PATH))
 endif
 
 git_url = https://github.com/vladzcloudius/osv-memcached
+git_tag = v0.2
+
 src_dir := $(notdir $(git_url))
 TARGET = $(src_dir)/osv-memcached.so
 
 module: $(TARGET)
 
 $(src_dir):
-	git clone $(git_url)
+	git clone $(git_url) -b $(git_tag)
 
 $(TARGET): $(src_dir)
 ifeq ($(OSV_BUILD_PATH),)
