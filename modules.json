@@ -78,5 +78,13 @@
 "leveldb" : {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/leveldb/"
+},
+"scala": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/scala/"
+},
+"scala-example": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/scala-example/"
 }
 }
