@@ -5,7 +5,7 @@
 # BSD license as described in the LICENSE file in the top-level directory.
 #
 
-.PHONEY: module get
+.PHONY: module get
 
 jvm.dir = install/usr/lib/jvm
 
