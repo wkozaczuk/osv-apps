@@ -1,6 +1,9 @@
 provides = ['java']
 
 from osv.modules.filemap import FileMap
+from osv.modules import api
+
+api.require('fonts')
 
 usr_files = FileMap()
 

@@ -1,4 +1,8 @@
 {
+"fonts": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/fonts/"
+},
 "tomcat": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/tomcat/"
