@@ -51,6 +51,10 @@
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/openjdk8/"
 },
+"openjdk8-fedora": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/openjdk8-fedora/"
+},
 "osv-memcached": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/osv-memcached/"
