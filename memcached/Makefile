@@ -13,15 +13,14 @@ sources := assoc.c cache.c daemon.c hash.c items.c memcached.c slabs.c \
 	stats.c thread.c util.c
 
 sources := $(addprefix src/, $(sources))
-objects := $(sources:c=o)
 
 $(sources): src
 
 CFLAGS = -std=gnu99 -fPIC -DHAVE_CONFIG_H
 LDFLAGS = -shared -levent
 
-memcached.so: $(objects)
-	$(CC) -o $@ $(LDFLAGS) $(objects)
+memcached.so: $(sources)
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(sources)
 
 clean:
 	rm -rf upstream src
