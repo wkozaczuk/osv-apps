@@ -86,5 +86,9 @@
 "scala-example": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/scala-example/"
+},
+"redis-memonly": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/redis-memonly/"
 }
 }
