@@ -9,8 +9,7 @@ cd upstream
 wget https://github.com/antirez/redis/archive/$VERSION.tar.gz
 tar zxvf $VERSION.tar.gz
 cd redis-$VERSION
-patch -p1 < ../../make.patch
-make CFLAGS="-fPIC" MALLOC=libc
+make CFLAGS="-fPIC" LDFLAGS="-shared" MALLOC=libc
 cd ../..
 pwd
 echo "/redis-server: ${PWD}/upstream/redis-$VERSION/src/redis-server" > usr.manifest
