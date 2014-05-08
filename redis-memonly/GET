@@ -9,7 +9,9 @@ cd upstream
 wget https://github.com/antirez/redis/archive/$VERSION.tar.gz
 tar zxvf $VERSION.tar.gz
 cd redis-$VERSION
-make CFLAGS="-fPIC" LDFLAGS="-shared" MALLOC=libc
+# TODO: something in our environment is ruining redis's make. Figure out
+# what, instead of using env -i...
+env -i PATH=$PATH make CFLAGS="-fPIC" LDFLAGS="-shared" MALLOC=libc
 cd ../..
 pwd
 echo "/redis-server: ${PWD}/upstream/redis-$VERSION/src/redis-server" > usr.manifest
