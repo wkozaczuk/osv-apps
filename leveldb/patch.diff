@@ -36,15 +36,4 @@ index 6e59c6f..dd21ffe 100755
  PLATFORM_LIBS=
  PLATFORM_SHARED_EXT="so"
  PLATFORM_SHARED_LDFLAGS="-shared -Wl,-soname -Wl,"
-diff --git a/db/db_bench.cc b/db/db_bench.cc
-index fc46d89..87d7c68 100644
---- a/db/db_bench.cc
-+++ b/db/db_bench.cc
-@@ -962,7 +962,6 @@ int main(int argc, char** argv) {
-       FLAGS_db = argv[i] + 5;
-     } else {
-       fprintf(stderr, "Invalid flag '%s'\n", argv[i]);
--      exit(1);
-     }
-   }
  
