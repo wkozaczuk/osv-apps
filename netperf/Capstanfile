@@ -1,0 +1,5 @@
+base: cloudius/osv-base
+cmdline: /netserver.so -D -4 -f
+build: make
+files:
+    /netserver.so: netserver.so

@@ -19,6 +19,7 @@ make clean
 make CFLAGS="-fPIC -shared"
 mkdir osv
 cp src/netserver osv/netserver.so
+cp src/netserver ../../netserver.so
 cd ../..
 
 cat > usr.manifest <<EOF
