@@ -16,3 +16,7 @@ make db_bench
 cp -vf db_bench ../db_bench.so
 cp -vf libleveldb.so.1.15 ..
 cd ..
+
+mkdir -p ROOTFS/usr/lib
+cp libleveldb.so.1.15 /lib64/libsnappy.so.1 ROOTFS/usr/lib
+cp db_bench.so ROOTFS

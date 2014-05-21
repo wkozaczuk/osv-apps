@@ -10,4 +10,4 @@ src:
 	./GET
 
 clean:
-	rm -rf leveldb-* *.tar.gz *.so leveldb *.manifest libleveldb.*
+	rm -rf leveldb-* *.tar.gz *.so leveldb *.manifest libleveldb.* ROOTFS
