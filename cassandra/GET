@@ -13,3 +13,8 @@ cd ..
 wget http://download.java.net/maven/2/net/java/dev/jna/jna/3.2.7/jna-3.2.7.jar
 cd ..
 #rm -r upstream
+mkdir -p ROOTFS/usr/cassandra/lib
+mkdir -p ROOTFS/usr/cassandra/conf
+mv upstream/apache-cassandra-2.0.3/lib ROOTFS/usr/cassandra
+mv upstream/apache-cassandra-2.0.3/conf ROOTFS/usr/cassandra
+mv upstream/jna-3.2.7.jar ROOTFS/usr/cassandra/lib
