@@ -94,5 +94,9 @@
 "redis-memonly": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/redis-memonly/"
+},
+"solr": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/solr/"
 }
 }
