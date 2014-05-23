@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ ! -e jython.jar ];then
+	wget get http://search.maven.org/remotecontent?filepath=org/python/jython-standalone/2.7-b2/jython-standalone-2.7-b2.jar -O jython.jar
+fi
+
+exit 0
