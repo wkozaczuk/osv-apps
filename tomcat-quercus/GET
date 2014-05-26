@@ -1,0 +1,9 @@
+#!/bin/bash
+
+QUERCUS_VERSION=4.0.39
+
+wget http://caucho.com/download/quercus-${QUERCUS_VERSION}.war
+mkdir -p ROOTFS/usr/tomcat/webapps/quercus
+cd ROOTFS/usr/tomcat/webapps/quercus
+unzip -x ../../../../../quercus-${QUERCUS_VERSION}.war
+

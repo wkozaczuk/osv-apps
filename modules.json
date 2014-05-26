@@ -7,6 +7,10 @@
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/tomcat/"
 },
+"tomcat-quercus": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/tomcat-quercus/"
+},
 "cassandra": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/cassandra/"
