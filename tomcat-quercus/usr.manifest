@@ -1,1 +1,1 @@
-/usr/tomcat/**:${MODULE_DIR}/ROOTFS/usr/tomcat/**
+/usr/tomcat/webapps/quercus/**:${MODULE_DIR}/ROOTFS/usr/tomcat/webapps/quercus/**
