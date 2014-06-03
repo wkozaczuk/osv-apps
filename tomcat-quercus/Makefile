@@ -1,7 +1,7 @@
 .PHONY: module
-module: upstream
+module: ROOTFS
 
-upstream:
+ROOTFS:
 	./GET
 
 clean:
