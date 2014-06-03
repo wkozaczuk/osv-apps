@@ -11,6 +11,10 @@
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/tomcat-quercus/"
 },
+"tomcat-gitblit": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/tomcat-gitblit/"
+},
 "cassandra": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/cassandra/"
