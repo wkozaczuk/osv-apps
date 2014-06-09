@@ -106,5 +106,9 @@
 "solr": {
     "type": "direct-dir",
     "path": "${OSV_BASE}/apps/solr/"
+},
+"opendaylight": {
+    "type": "direct-dir",
+    "path": "${OSV_BASE}/apps/opendaylight/"
 }
 }
