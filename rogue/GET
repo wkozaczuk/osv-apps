@@ -27,7 +27,7 @@ tar zxvf rogue5.4.4-src.tar.gz
 cd rogue5.4.4
 CFLAGS="-fPIC -O2" ./configure --prefix=/usr 
 cat >> Makefile << END
-LDFLAGS=-shared
+LDFLAGS=-pie
 LIBS=../ncurses-5.9/lib/libncurses.a
 END
 make
