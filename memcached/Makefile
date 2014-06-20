@@ -1,7 +1,7 @@
 .PHONY: module
-module: memcached.so
-	echo '/memcached.so: $${MODULE_DIR}/memcached.so' > usr.manifest
-	ldd memcached.so | grep libevent | \
+module: memcached
+	echo '/memcached: $${MODULE_DIR}/memcached' > usr.manifest
+	ldd memcached | grep libevent | \
 		sed 's/ *[^ ] *\(.*\) => \(.*\) .*/\/\1: \2/' \
 		>> usr.manifest
 	: > bootfs.manifest
@@ -17,11 +17,10 @@ sources := $(addprefix src/, $(sources))
 $(sources): src
 
 CFLAGS = -std=gnu99 -fPIC -DHAVE_CONFIG_H
-LDFLAGS = -shared -levent
 
-memcached.so: $(sources)
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(sources)
+memcached: $(sources)
+	$(CC) -pie -o $@ $(CFLAGS) $(LDFLAGS) $(sources) -levent -lpthread
 
 clean:
 	rm -rf upstream src
-	rm -f bootfs.manifest usr.manifest module.pyc memcached.so
+	rm -f bootfs.manifest usr.manifest module.pyc memcached
