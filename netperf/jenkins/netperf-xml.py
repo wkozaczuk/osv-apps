@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from optparse import OptionParser
 import sys
 import datetime
+import re
 
 op = OptionParser()
 op.add_option('-o', '--output', metavar = 'FILE',
@@ -23,6 +24,10 @@ tests = {
 result = None
 with open(args[0]) as f:
     lines = f.readlines()
+    ignoreline = re.compile(r'catcher: timer popped with times_up != 0')
+    lines = [x
+             for x in lines
+             if not re.match(ignoreline, x)]
     for name in tests:
         if lines[0].startswith(name):
             row, col = tests[name]
