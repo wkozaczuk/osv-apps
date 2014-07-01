@@ -1,0 +1,67 @@
+diff -Nur obstack-1.2.orig/Makefile.am obstack-1.2/Makefile.am
+--- obstack-1.2.orig/Makefile.am	2014-06-07 00:06:59.343794276 +0900
++++ obstack-1.2/Makefile.am	2014-06-07 00:19:05.813204761 +0900
+@@ -4,7 +4,7 @@
+ pkgconfig_DATA = obstack.pc
+ 
+ lib_LTLIBRARIES = libobstack.la
+-libobstack_la_SOURCES = obstack.c obstack_printf.c
++libobstack_la_SOURCES = obstack.c obstack_printf.c obstack_vprintf.c
+ libobstack_la_LDFLAGS = -version-info $(LT_VERSION)
+ 
+ libobstackincludedir = $(includedir)
+diff -Nur obstack-1.2.orig/Makefile.in obstack-1.2/Makefile.in
+--- obstack-1.2.orig/Makefile.in	2014-06-07 00:06:59.343794276 +0900
++++ obstack-1.2/Makefile.in	2014-06-07 00:19:44.204267836 +0900
+@@ -65,7 +65,7 @@
+ libLTLIBRARIES_INSTALL = $(INSTALL)
+ LTLIBRARIES = $(lib_LTLIBRARIES)
+ libobstack_la_LIBADD =
+-am_libobstack_la_OBJECTS = obstack.lo obstack_printf.lo
++am_libobstack_la_OBJECTS = obstack.lo obstack_printf.lo obstack_vprintf.lo
+ libobstack_la_OBJECTS = $(am_libobstack_la_OBJECTS)
+ DEFAULT_INCLUDES = -I. -I$(srcdir)
+ depcomp = $(SHELL) $(top_srcdir)/depcomp
+@@ -198,7 +198,7 @@
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA = obstack.pc
+ lib_LTLIBRARIES = libobstack.la
+-libobstack_la_SOURCES = obstack.c obstack_printf.c
++libobstack_la_SOURCES = obstack.c obstack_printf.c obstack_vprintf.c
+ libobstack_la_LDFLAGS = -version-info $(LT_VERSION)
+ libobstackincludedir = $(includedir)
+ libobstackinclude_HEADERS = obstack.h
+@@ -279,6 +279,7 @@
+ 
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obstack.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obstack_printf.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obstack_vprintf.Plo@am__quote@
+ 
+ .c.o:
+ @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
+diff -Nur obstack-1.2.orig/obstack_vprintf.c obstack-1.2/obstack_vprintf.c
+--- obstack-1.2.orig/obstack_vprintf.c	1970-01-01 09:00:00.000000000 +0900
++++ obstack-1.2/obstack_vprintf.c	2014-06-07 00:20:00.078303085 +0900
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (C) 2014 Cloudius Systems, Ltd.
++ *
++ * This work is open source software, licensed under the terms of the
++ * BSD license as described in the LICENSE file in the top-level directory.
++ */
++
++#include <stdarg.h>
++#include <stdio.h>
++#include "obstack.h"
++
++int obstack_vprintf(struct obstack *obst, const char *fmt, va_list ap)
++{
++    char buf[1024];
++    int len;
++
++    len = vsnprintf(buf, sizeof(buf), fmt, ap);
++    obstack_grow(obst, buf, len);
++
++    return len;
++}
++

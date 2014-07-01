@@ -1,0 +1,12 @@
+diff -Nur ruby.orig/thread_pthread.c ruby/thread_pthread.c
+--- ruby.orig/thread_pthread.c	2014-06-20 07:44:27.131259578 +0900
++++ ruby/thread_pthread.c	2014-06-20 07:44:43.612250114 +0900
+@@ -59,7 +59,7 @@
+ 
+ #if defined(HAVE_POLL) && defined(HAVE_FCNTL) && defined(F_GETFL) && defined(F_SETFL) && defined(O_NONBLOCK) && !defined(__native_client__)
+ /* The timer thread sleeps while only one Ruby thread is running. */
+-# define USE_SLEEPY_TIMER_THREAD 1
++# define USE_SLEEPY_TIMER_THREAD 0
+ #else
+ # define USE_SLEEPY_TIMER_THREAD 0
+ #endif
