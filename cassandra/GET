@@ -1,6 +1,6 @@
 # Build a ... directory from the upstream cassandra.
 set -e
-VERSION=2.0.3
+VERSION=2.0.9
 
 mkdir upstream
 cd upstream
@@ -15,6 +15,6 @@ cd ..
 #rm -r upstream
 mkdir -p ROOTFS/usr/cassandra/lib
 mkdir -p ROOTFS/usr/cassandra/conf
-cp --reflink=auto -r upstream/apache-cassandra-2.0.3/lib ROOTFS/usr/cassandra
-cp --reflink=auto -r upstream/apache-cassandra-2.0.3/conf ROOTFS/usr/cassandra
+cp --reflink=auto -r upstream/apache-cassandra-$VERSION/lib ROOTFS/usr/cassandra
+cp --reflink=auto -r upstream/apache-cassandra-$VERSION/conf ROOTFS/usr/cassandra
 cp --reflink=auto upstream/jna-3.2.7.jar ROOTFS/usr/cassandra/lib
