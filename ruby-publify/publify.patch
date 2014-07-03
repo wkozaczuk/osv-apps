@@ -1,0 +1,79 @@
+diff --git a/Gemfile b/Gemfile
+index f9dcee0..c43f0d1 100644
+--- a/Gemfile
++++ b/Gemfile
+@@ -81,3 +81,4 @@ end
+ Dir.glob(File.join(File.dirname(__FILE__), 'themes', '**', "Gemfile")) do |gemfile|
+   eval(IO.read(gemfile), binding)
+ end
++gem 'therubyracer',  platforms: :ruby
+diff --git a/Rakefile b/Rakefile
+index f1b75fb..4f2b2a0 100644
+--- a/Rakefile
++++ b/Rakefile
+@@ -3,5 +3,7 @@
+ 
+ require File.expand_path('../config/application', __FILE__)
+ require 'rake'
++require 'carrierwave'
++require 'recaptcha'
+ 
+ Publify::Application.load_tasks
+diff --git a/config/application.rb b/config/application.rb
+index 94698db..f9647f8 100644
+--- a/config/application.rb
++++ b/config/application.rb
+@@ -3,7 +3,37 @@ require File.expand_path('../boot', __FILE__)
+ require 'rails/all'
+ 
+ # Auto-require default libraries and those for the current Rails environment.
+-Bundler.require :default, Rails.env
++#Bundler.require :default, Rails.env
++
++require 'thin'
++require 'yaml'
++require 'sqlite3'
++require 'rails'
++require 'htmlentities'
++require 'bluecloth'
++require 'coderay'
++require 'kaminari'
++require 'RedCloth'
++require 'addressable/uri'
++require 'mini_magick'
++require 'uuidtools'
++require 'flickraw-cached'
++require 'rubypants'
++require 'rake'
++require 'fog'
++require 'recaptcha'
++require 'carrierwave'
++require 'akismet'
++require 'twitter'
++require 'jquery-rails'
++require 'jquery-ui-rails'
++require 'rails_autolink'
++require 'dynamic_form'
++require 'sass-rails'
++require 'coffee-rails'
++require 'uglifier'
++require 'therubyracer'
++require 'turbolinks'
+ 
+ module Publify
+   class Application < Rails::Application
+diff --git a/config/boot.rb b/config/boot.rb
+index ab6cb37..883b007 100644
+--- a/config/boot.rb
++++ b/config/boot.rb
+@@ -4,8 +4,8 @@ require 'rubygems'
+ gemfile = File.expand_path('../../Gemfile', __FILE__)
+ begin
+   ENV['BUNDLE_GEMFILE'] = gemfile
+-  require 'bundler'
+-  Bundler.setup
++#  require 'bundler'
++#  Bundler.setup
+ rescue Bundler::GemNotFound => e
+   STDERR.puts e.message
+   STDERR.puts "Try running `bundle install`."
