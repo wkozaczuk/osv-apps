@@ -10,4 +10,4 @@ usr.manifest:
 		>> usr.manifest
 
 clean:
-	usr.manifest
+	rm -f usr.manifest
