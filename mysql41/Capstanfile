@@ -1,0 +1,5 @@
+base: cloudius/osv-base
+
+cmdline: --cwd=/mysql41 ./mysqld --pid-file=mysqld.pid --datadir=./data
+
+build: make
