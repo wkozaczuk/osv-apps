@@ -25,7 +25,7 @@ upstream/ruby:
 	mkdir -p upstream
 	cd upstream && git clone --depth 1 -b v2_1_2 https://github.com/ruby/ruby.git && cd ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
 	cd upstream/ruby && autoconf
-	cd upstream/ruby && CFLAGS=-fPIC ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc
+	cd upstream/ruby && ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc
 
 upstream/obstack-1.2.tar.bz2:
 	mkdir -p upstream
