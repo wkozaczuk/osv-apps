@@ -2,14 +2,9 @@
 
 VER=osv-v1
 
-if [ ! -e ${VER}.tar.gz ];then
-    wget https://github.com/asias/FrameworkBenchmarks/archive/${VER}.tar.gz
+if [ ! -e servlet.war ];then
+    wget https://github.com/cloudius-systems/FrameworkBenchmarks/releases/download/${VER}/servlet.war
 fi
 mkdir -p ROOTFS/usr/tomcat/webapps/
-rm -rf FrameworkBenchmarks
-tar xvf ${VER}.tar.gz
-mv FrameworkBenchmarks-${VER} FrameworkBenchmarks
-cp -av context.xml FrameworkBenchmarks/servlet/src/main/webapp/META-INF/context.xml
-cd FrameworkBenchmarks/servlet
-mvn clean install
-cp -av target/servlet.war ../../ROOTFS/usr/tomcat/webapps
+zip servlet.war META-INF/context.xml
+cp -av servlet.war ROOTFS/usr/tomcat/webapps
