@@ -3,4 +3,4 @@ module:
 	./GET
 
 clean:
-	rm -rf ROOTFS FrameworkBenchmarks *.tar.gz
+	rm -rf ROOTFS servlet.war
