@@ -1,0 +1,14 @@
+--- rpm-4.11.2.orig/lib/cpio.c	2013-11-22 14:31:31.000000000 +0400
++++ rpm-4.11.2/lib/cpio.c	2014-07-17 17:47:54.648819908 +0400
+@@ -289,11 +289,9 @@ int rpmcpioHeaderRead(rpmcpio_t cpio, ch
+ 
+     GET_NUM_FIELD(hdr.devMajor, major);
+     GET_NUM_FIELD(hdr.devMinor, minor);
+-    st->st_dev = makedev(major, minor);
+ 
+     GET_NUM_FIELD(hdr.rdevMajor, major);
+     GET_NUM_FIELD(hdr.rdevMinor, minor);
+-    st->st_rdev = makedev(major, minor);
+ 
+     GET_NUM_FIELD(hdr.namesize, nameSize);
+ 
