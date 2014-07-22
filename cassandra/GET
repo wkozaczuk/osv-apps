@@ -2,15 +2,15 @@
 set -e
 VERSION=2.0.9
 
-mkdir upstream
+mkdir -p upstream
 cd upstream
-wget http://archive.apache.org/dist/cassandra/$VERSION/apache-cassandra-$VERSION-bin.tar.gz
+wget -nc http://archive.apache.org/dist/cassandra/$VERSION/apache-cassandra-$VERSION-bin.tar.gz
 tar zxvf apache-cassandra-$VERSION-bin.tar.gz
 cd apache-cassandra-$VERSION
 patch -p1 < ../../cassandra-osv.patch
 cd ..
 
-wget http://download.java.net/maven/2/net/java/dev/jna/jna/3.2.7/jna-3.2.7.jar
+wget -nc http://download.java.net/maven/2/net/java/dev/jna/jna/3.2.7/jna-3.2.7.jar
 cd ..
 #rm -r upstream
 mkdir -p ROOTFS/usr/cassandra/lib
