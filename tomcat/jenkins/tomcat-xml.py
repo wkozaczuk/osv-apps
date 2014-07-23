@@ -68,10 +68,10 @@ def write_xml(w, result):
     report = ET.Element('report', categ = 'tomcat')
     add_time(report, 'start')
     test = ET.SubElement(report, 'test',
-                         name = 'iperf-tcp-4cpu-1s-stream',
+                         name = 'tomcat-wrk-perf',
                          executed = 'yes')
     ET.SubElement(test, 'description').text = (
-        'iperf single stream bandwidth to 4 cpu guest')
+        'Tomcat/WRK performance measurement')
     res = ET.SubElement(test, 'result')
     ET.SubElement(res, 'success', passed = 'yes',
                   state = '1', hasTimeOut = 'no')
