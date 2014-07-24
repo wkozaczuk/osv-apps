@@ -7,6 +7,10 @@
 #
 
 SRC_ROOT=$1
+AWS_REGION=$2
+AWS_ZONE=$3
+AWS_PLACEMENT_GROUP="$4"
+
 SCRIPTS_ROOT="`pwd`/scripts"
 
 . $SCRIPTS_ROOT/ec2-utils.sh
@@ -31,7 +35,10 @@ prepare_instance_for_test() {
 
  echo "=== Create OSv instance ==="
  $SCRIPTS_ROOT/release-ec2.sh --instance-only \
-                              --override-version $TEST_OSV_VER || handle_test_error
+                              --override-version $TEST_OSV_VER \
+                              --region $AWS_REGION \
+                              --zone $AWS_ZONE \
+                              --placement-group $AWS_PLACEMENT_GROUP || handle_test_error
 
  TEST_INSTANCE_ID=`get_instance_id_by_name $TEST_INSTANCE_NAME`
 
