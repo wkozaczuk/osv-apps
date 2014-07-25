@@ -1,0 +1,17 @@
+version = 3.1.0
+tarball = $(version).tar.gz
+
+.PHONY: module
+module: wrk
+	cd wrk && make 
+
+$(tarball):
+	wget https://github.com/wg/wrk/archive/$(version).tar.gz
+
+wrk: $(tarball)
+	tar xvzf $(tarball)
+	mv wrk-$(version) wrk
+	cd wrk && patch -p1 < ../0001-make-build-as-DSO.patch
+
+clean:
+	rm -rf wrk $(tarball)

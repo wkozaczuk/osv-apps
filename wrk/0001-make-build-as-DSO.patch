@@ -1,0 +1,56 @@
+From ab2c6e9ae71bf62dfb747bfc5313437df9e8d196 Mon Sep 17 00:00:00 2001
+From: Tomasz Grabiec <tgrabiec@cloudius-systems.com>
+Date: Thu, 24 Jul 2014 16:17:43 +0200
+Subject: [PATCH] make: build as DSO
+
+Signed-off-by: Tomasz Grabiec <tgrabiec@cloudius-systems.com>
+---
+ Makefile | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index d1175e2..9ee81ff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,4 @@
+-CFLAGS  := -std=c99 -Wall -O2 -D_REENTRANT
++CFLAGS  := -std=c99 -Wall -O2 -D_REENTRANT -fPIC
+ LIBS    := -lpthread -lm -lcrypto -lssl
+ 
+ TARGET  := $(shell uname -s | tr [A-Z] [a-z] 2>/dev/null || echo unknown)
+@@ -18,7 +18,7 @@ endif
+ 
+ SRC  := wrk.c net.c ssl.c aprintf.c stats.c script.c units.c \
+ 		ae.c zmalloc.c http_parser.c tinymt64.c
+-BIN  := wrk
++BIN  := wrk.so
+ 
+ ODIR := obj
+ OBJ  := $(patsubst %.c,$(ODIR)/%.o,$(SRC)) $(ODIR)/bytecode.o
+@@ -36,9 +36,9 @@ clean:
+ 
+ $(BIN): $(OBJ)
+ 	@echo LINK $(BIN)
+-	@$(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
++	@$(CC) $(LDFLAGS) -shared -o $@ $^ $(LIBS)
+ 
+-$(OBJ): config.h Makefile $(LDIR)/libluajit.a | $(ODIR)
++$(OBJ): config.h Makefile $(LDIR)/libluajit.so | $(ODIR)
+ 
+ $(ODIR):
+ 	@mkdir -p $@
+@@ -51,9 +51,9 @@ $(ODIR)/%.o : %.c
+ 	@echo CC $<
+ 	@$(CC) $(CFLAGS) -c -o $@ $<
+ 
+-$(LDIR)/libluajit.a:
++$(LDIR)/libluajit.so:
+ 	@echo Building LuaJIT...
+-	@$(MAKE) -C $(LDIR) BUILDMODE=static
++	@$(MAKE) -C $(LDIR) BUILDMODE=shared
+ 
+ .PHONY: all clean
+ .SUFFIXES:
+-- 
+1.9.1
+
