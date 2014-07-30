@@ -3,7 +3,7 @@ tarball = $(version).tar.gz
 
 .PHONY: module
 module: wrk
-	cd wrk && make 
+	$(MAKE) -C wrk
 
 $(tarball):
 	wget https://github.com/wg/wrk/archive/$(version).tar.gz
