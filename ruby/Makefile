@@ -96,6 +96,22 @@ usr.manifest: ruby.so upstream/bundler upstream/cert.pem ${OPENSSL} ${EXT_OPENSS
 		>> usr.manifest
 	: > bootfs.manifest
 
+ROOTFS: module
+	mkdir -p ./ROOTFS/usr/lib/ruby/2.1.0/x86_64-linux
+	mkdir -p ./ROOTFS/usr/local/ssl
+	cp -a ./upstream/ruby/.ext/common/* ./ROOTFS/usr/lib/ruby/2.1.0
+	cp -a ./upstream/bundler/lib/* ./ROOTFS/usr/lib/ruby/2.1.0
+	cp ruby.so ./ROOTFS/
+	cp -a ./upstream/ruby/bin/* ./ROOTFS/
+	cp ./upstream/ruby/libruby.so ./ROOTFS/libruby.so.2.1
+	cp -a ./upstream/ruby/lib/* ./ROOTFS/usr/lib/ruby/2.1.0
+	cp ./upstream/ruby/rbconfig.rb ./ROOTFS/usr/lib/ruby/2.1.0/x86_64-linux/rbconfig.rb
+	cp -a ./upstream/ruby/.ext/x86_64-linux/* ./ROOTFS/usr/lib/ruby/2.1.0/x86_64-linux/
+	cp ./upstream/cert.pem ./ROOTFS/usr/local/ssl/cert.pem
+	find upstream/ruby/.ext/x86_64-linux/ -name '*.so' -exec ldd {} \;|awk '{print "cp",$$3,"./ROOTFS/"}'|grep "/lib"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|grep -v "libruby.so"|sort|uniq > tmp.sh
+	sh tmp.sh
+	rm tmp.sh
+
 .PHONY: clean
 clean:
-	rm -rf upstream *.o *.so usr.manifest
+	rm -rf upstream *.o *.so usr.manifest ROOTFS
