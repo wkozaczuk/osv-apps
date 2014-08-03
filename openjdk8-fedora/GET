@@ -21,3 +21,12 @@ mkdir  upstream
 mkdir  install
 
 curl -o upstream/jdk8.rpm "${dir}${fullname}"
+
+# also get tzdata-java package, which Fedora Java 8 package needs
+dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
+basename=tzdata-java
+suffix=.noarch.rpm
+fullname=$(curl "${dir}"  \
+          | grep -Eo "${basename}[a-zA-Z0-9\.-]+${suffix}" \
+          | head -n 1)
+curl -o upstream/tzdata-java.rpm "${dir}${fullname}"
