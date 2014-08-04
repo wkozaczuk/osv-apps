@@ -12,6 +12,7 @@ wrk: $(tarball)
 	tar xvzf $(tarball)
 	mv wrk-$(version) wrk
 	cd wrk && patch -p1 < ../0001-make-build-as-DSO.patch
+	cd wrk && patch -p1 < ../wrk-fix-uninit-connection.patch
 
 clean:
 	rm -rf wrk $(tarball)
