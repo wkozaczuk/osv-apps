@@ -46,7 +46,7 @@ make install DESTDIR=${BUILD}
 cd ..
 cd ..
 echo "
-/bin/rpm: ${BUILD}/bin/rpm
+/tools/rpm.so: ${BUILD}/../../rpm.so
 /usr/bin/rpmdb: ${BUILD}/usr/bin/rpmdb
 /usr/lib/rpm/**: ${BUILD}/usr/lib/rpm/**
 /usr/lib/librpmsign.so: ${BUILD}/usr/lib64/librpmsign.so.1.2.1
