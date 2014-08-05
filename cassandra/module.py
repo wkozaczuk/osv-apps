@@ -4,7 +4,7 @@ default = api.run_java(
     jvm_args=[
         '-javaagent:/usr/cassandra/lib/jamm-0.2.5.jar',
         '-XX:+UseThreadPriorities',
-        # '-XX:ThreadPriorityPolicy=42',
+        '-XX:ThreadPriorityPolicy=42',
         '-Xms1968M',
         '-Xmx1968M',
         '-Xmn400M',
