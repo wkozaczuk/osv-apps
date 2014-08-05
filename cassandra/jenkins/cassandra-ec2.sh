@@ -6,9 +6,10 @@
 #  BSD license as described in the LICENSE file in the top-level directory.
 #
 
-AWS_REGION=$2
-AWS_ZONE=$3
-AWS_PLACEMENT_GROUP="$4"
+AWS_REGION=$1
+AWS_ZONE=$2
+AWS_PLACEMENT_GROUP=$3
+INSTANCE_TYPE=$4
 
 SCRIPTS_ROOT="`pwd`/scripts"
 
@@ -45,7 +46,7 @@ prepare_instance_for_test() {
   handle_test_error
  fi
 
- change_instance_type $TEST_INSTANCE_ID cc2.8xlarge || handle_test_error
+ change_instance_type $TEST_INSTANCE_ID $INSTANCE_TYPE || handle_test_error
  start_instances $TEST_INSTANCE_ID || handle_test_error
  wait_for_instance_startup $TEST_INSTANCE_ID 300 || handle_test_error
 
