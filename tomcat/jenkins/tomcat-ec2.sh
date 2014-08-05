@@ -34,12 +34,16 @@ prepare_instance_for_test() {
  local TEST_OSV_VER=`$SCRIPTS_ROOT/osv-version.sh`-jenkins-perf-ec2-`timestamp`
  local TEST_INSTANCE_NAME=OSv-$TEST_OSV_VER
 
+ if test x"$AWS_PLACEMENT_GROUP" != x""; then
+  PLACEMENT_GROUP_PARAM="--placement-group $AWS_PLACEMENT_GROUP"
+ fi
+
  echo "=== Create OSv instance ==="
  $SCRIPTS_ROOT/release-ec2.sh --instance-only \
                               --override-version $TEST_OSV_VER \
                               --region $AWS_REGION \
                               --zone $AWS_ZONE \
-                              --placement-group $AWS_PLACEMENT_GROUP || handle_test_error
+                              $PLACEMENT_GROUP_PARAM || handle_test_error
 
  TEST_INSTANCE_ID=`get_instance_id_by_name $TEST_INSTANCE_NAME`
 
