@@ -67,15 +67,17 @@ make -j `nproc` image=tomcat-benchmark img_format=raw || handle_test_error
 
 prepare_instance_for_test
 
-ping -c 4 $TEST_INSTANCE_IP
-
 echo "=== Warmup ==="
+ping -c 4 $TEST_INSTANCE_IP
 $SRC_ROOT/wrk/wrk -t4 -c16 -d5m http://$TEST_INSTANCE_IP:8081/servlet/json || handle_test_error
+ec2-get-console-output $TEST_INSTANCE_ID
 
 echo "=== Main test ==="
+ping -c 4 $TEST_INSTANCE_IP
 WRK_OUT_FILE=wrk.out
 echo "Output goes to $WRK_OUT_FILE"
 $SRC_ROOT/wrk/wrk --latency -t4 -c128 -d5m http://$TEST_INSTANCE_IP:8081/servlet/json | tee $WRK_OUT_FILE
+ec2-get-console-output $TEST_INSTANCE_ID
 
 python3 apps/tomcat/jenkins/tomcat-xml.py -o tomcat-perf.xml -m tps $WRK_OUT_FILE || handle_test_error
 
