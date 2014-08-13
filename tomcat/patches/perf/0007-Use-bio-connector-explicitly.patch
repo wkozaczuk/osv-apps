@@ -1,0 +1,25 @@
+From 7fd558c61e1d5fd91d506e5346318b4bbcf19a5b Mon Sep 17 00:00:00 2001
+From: Asias He <asias@cloudius-systems.com>
+Date: Wed, 16 Jul 2014 10:14:37 +0800
+Subject: [PATCH 1/2] Use bio connector explicitly
+
+---
+ conf/server.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/server.xml b/conf/server.xml
+index d5f8369..8f21a71 100644
+--- a/conf/server.xml
++++ b/conf/server.xml
+@@ -67,7 +67,7 @@
+          APR (HTTP/AJP) Connector: /docs/apr.html
+          Define a non-SSL HTTP/1.1 Connector on port 8080
+     -->
+-    <Connector port="8081" protocol="HTTP/1.1"
++    <Connector port="8081" protocol="org.apache.coyote.http11.Http11Protocol"
+                connectionTimeout="20000"
+                maxThreads="800"
+                minSpareThreads="256"
+-- 
+1.8.5.1
+

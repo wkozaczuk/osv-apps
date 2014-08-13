@@ -1,0 +1,25 @@
+From 4252b1f642068aeb71482555586319d28c5e143d Mon Sep 17 00:00:00 2001
+From: Asias He <asias@cloudius-systems.com>
+Date: Wed, 16 Jul 2014 10:14:57 +0800
+Subject: [PATCH 2/2] Do not enable AJP connector
+
+---
+ conf/server.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/conf/server.xml b/conf/server.xml
+index 8f21a71..65bd09e 100644
+--- a/conf/server.xml
++++ b/conf/server.xml
+@@ -91,7 +91,7 @@
+     -->
+ 
+     <!-- Define an AJP 1.3 Connector on port 8009 -->
+-    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
++    <!-- <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" /> -->
+ 
+ 
+     <!-- An Engine represents the entry point (within Catalina) that processes
+-- 
+1.8.5.1
+
