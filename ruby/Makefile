@@ -49,7 +49,7 @@ upstream/cert.pem:
 	cd upstream && wget -O cert.pem "http://curl.haxx.se/ca/cacert.pem"
 
 ${OPENSSL}: upstream/openssl-${SSL_VER}.tar.gz
-	cd upstream/openssl-${SSL_VER} && make
+	cd upstream/openssl-${SSL_VER} && make MAKEFLAGS=
 
 ${LIBOBSTACK_A}: upstream/obstack-1.2.tar.bz2
 	cd upstream/obstack-1.2/ && make
@@ -57,23 +57,23 @@ ${LIBOBSTACK_A}: upstream/obstack-1.2.tar.bz2
 ${LIBRUBY}: upstream/ruby
 	cd upstream/ruby && make
 
-${EXT_OPENSSL}:
+${EXT_OPENSSL}: ${LIBRUBY} ${OPENSSL}
 	cd upstream/ruby/ext/openssl && mv Makefile Makefile.orig
 	cd upstream/ruby/ext/openssl && sed -e "s#-lssl#../../../openssl-${SSL_VER}/libssl.a#" Makefile.orig|sed -e "s#-lcrypto#../../../openssl-${SSL_VER}/libcrypto.a#" > Makefile
 	cd upstream/ruby/ext/openssl && make
-${EXT_DIGEST_MD5}:
+${EXT_DIGEST_MD5}: ${LIBRUBY} ${OPENSSL}
 	cd upstream/ruby/ext/digest/md5 && mv Makefile Makefile.orig
 	cd upstream/ruby/ext/digest/md5 && sed -e "s#-lssl#../../../../openssl-${SSL_VER}/libssl.a#" Makefile.orig|sed -e "s#-lcrypto#../../../../openssl-${SSL_VER}/libcrypto.a#" > Makefile
 	cd upstream/ruby/ext/digest/md5 && make
-${EXT_DIGEST_RMD160}:
+${EXT_DIGEST_RMD160}: ${LIBRUBY} ${OPENSSL}
 	cd upstream/ruby/ext/digest/rmd160 && mv Makefile Makefile.orig
 	cd upstream/ruby/ext/digest/rmd160 && sed -e "s#-lssl#../../../../openssl-${SSL_VER}/libssl.a#" Makefile.orig|sed -e "s#-lcrypto#../../../../openssl-${SSL_VER}/libcrypto.a#" > Makefile
 	cd upstream/ruby/ext/digest/rmd160 && make
-${EXT_DIGEST_SHA1}:
+${EXT_DIGEST_SHA1}: ${LIBRUBY} ${OPENSSL}
 	cd upstream/ruby/ext/digest/sha1 && mv Makefile Makefile.orig
 	cd upstream/ruby/ext/digest/sha1 && sed -e "s#-lssl#../../../../openssl-${SSL_VER}/libssl.a#" Makefile.orig|sed -e "s#-lcrypto#../../../../openssl-${SSL_VER}/libcrypto.a#" > Makefile
 	cd upstream/ruby/ext/digest/sha1 && make
-${EXT_DIGEST_SHA2}:
+${EXT_DIGEST_SHA2}: ${LIBRUBY} ${OPENSSL}
 	cd upstream/ruby/ext/digest/sha2 && mv Makefile Makefile.orig
 	cd upstream/ruby/ext/digest/sha2 && sed -e "s#-lssl#../../../../openssl-${SSL_VER}/libssl.a#" Makefile.orig|sed -e "s#-lcrypto#../../../../openssl-${SSL_VER}/libcrypto.a#" > Makefile
 	cd upstream/ruby/ext/digest/sha2 && make
