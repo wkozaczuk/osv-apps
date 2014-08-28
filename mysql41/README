@@ -1,0 +1,20 @@
++ How to build
+
+$ make image=mysql41
+
++ How to test
+
+$ sudo scripts/run.py -nv
+$ ./apps/mysql41/host/bin/mysql -u admin -p -h 192.168.122.89 mysql
+<type password 'osv'>
+<try some SQLs>
+
++ How to change password
+
+Same as MySQL on Linux host, use 'SET PASSWORD FOR' or update mysql.user table.
+
++ How to change DB configuration
+
+Change my.cnf before building OSv.
+You may also able to modify my.cnf on running time, using OSv REST API.
+In that case, you'll need restart OSv instance after updated the configuration.
