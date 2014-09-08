@@ -29,3 +29,19 @@ i::Isolate::EnsureDefaultIsolate();
 .
 w
 EOF
+
+ed -s deps/uv/src/unix/thread.c << EOF
+/int uv_barrier_init/i
+#endif
+#if 1
+.
+w
+EOF
+
+ed -s deps/uv/include/uv-private/uv-unix.h <<EOF
+/#if defined(__APPLE/a
+#endif
+#if 1
+.
+w
+EOF
