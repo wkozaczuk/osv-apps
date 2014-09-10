@@ -1,0 +1,47 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+
+if test $# -ne 1
+then
+  echo "usage: $0 <node-version>" 1>&2
+  exit 1
+fi
+
+cd "node-$1"
+
+ed -s node.gyp << EOF
+,s/'executable'/'shared_library'/
+g/'-Wl,--whole-archive/d
+w
+EOF
+
+ed -s common.gypi << EOF
+,s/'cflags':.*'-pthread'/&, '-fPIC'/
+w
+EOF
+
+ed -s deps/v8/src/api.cc << EOF
+/i::FlagList::SetFlagsFromCommandLine/i
+i::Isolate::EnsureDefaultIsolate();
+.
+w
+EOF
+
+ed -s deps/uv/src/unix/thread.c << EOF
+/int uv_barrier_init/i
+#endif
+#if 1
+.
+w
+EOF
+
+ed -s deps/uv/include/uv-private/uv-unix.h <<EOF
+/#if defined(__APPLE/a
+#endif
+#if 1
+.
+w
+EOF
