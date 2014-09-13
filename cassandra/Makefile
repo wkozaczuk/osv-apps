@@ -1,5 +1,6 @@
 VERSION=2.0.9
-dir=upstream/apache-cassandra-$(VERSION)
+current_name=apache-cassandra-$(VERSION)
+dir=upstream/$(current_name)
 tarball_name=apache-cassandra-$(VERSION)-bin.tar.gz
 tarball=upstream/$(tarball_name)
 jna_version=3.2.7
@@ -13,6 +14,7 @@ module: $(dir)
 	cp --reflink=auto -r $(dir)/lib ROOTFS/usr/cassandra
 	cp --reflink=auto -r $(dir)/conf ROOTFS/usr/cassandra
 	cp --reflink=auto $(jna) ROOTFS/usr/cassandra/lib
+	ln -sf $(current_name) upstream/current
 
 $(dir): $(tarball) $(jna) upstream
 	cd upstream && tar zxvf $(tarball_name)
