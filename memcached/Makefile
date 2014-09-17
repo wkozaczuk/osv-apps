@@ -16,7 +16,7 @@ sources := $(addprefix src/, $(sources))
 
 $(sources): src
 
-CFLAGS = -std=gnu99 -fPIC -DHAVE_CONFIG_H
+CFLAGS = -std=gnu99 -fpie -rdynamic -DHAVE_CONFIG_H
 
 memcached: $(sources)
 	$(CC) -pie -o $@ $(CFLAGS) $(LDFLAGS) $(sources) -levent -lpthread
