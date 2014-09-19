@@ -14,7 +14,7 @@ module: $(dir)
 	cp --reflink=auto -r $(dir)/lib ROOTFS/usr/cassandra
 	cp --reflink=auto -r $(dir)/conf ROOTFS/usr/cassandra
 	cp --reflink=auto $(jna) ROOTFS/usr/cassandra/lib
-	ln -sf $(current_name) upstream/current
+	ln -sfn $(current_name) upstream/current
 
 $(dir): $(tarball) $(jna) upstream
 	cd upstream && tar zxvf $(tarball_name)
