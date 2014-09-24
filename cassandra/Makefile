@@ -16,6 +16,7 @@ module: $(dir)
 	cp --reflink=auto $(jna) ROOTFS/usr/cassandra/lib
 	ln -sfn $(current_name) upstream/current
 	cp cassandra.yaml ROOTFS/usr/cassandra/conf/cassandra.yaml
+	cp cassandra.yaml.template ROOTFS/usr/cassandra/conf/cassandra.yaml.template
 
 $(dir): $(tarball) $(jna) upstream
 	cd upstream && tar zxvf $(tarball_name)
