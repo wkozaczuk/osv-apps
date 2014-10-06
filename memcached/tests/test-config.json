@@ -1,9 +1,0 @@
-{
-  "tester" : {
-     "ip" : "$tester_ip"
-  },
-  "sut" : {
-     "ip" : "$sut_ip"
-  }
-}
-
