@@ -20,7 +20,7 @@ tmp/bin/bundle:
 	GEM_HOME=tmp gem install --no-ri --no-rdoc bundler
 ROOTFS/osv_test: tmp/bin/rails tmp/bin/bundle
 	mkdir -p ROOTFS
-	cd ROOTFS && env GEM_HOME=../tmp ../tmp/bin/rails new osv_test
+	env GEM_HOME=tmp tmp/bin/rails new ROOTFS/osv_test
 	cd ROOTFS/osv_test && patch -p0 < ../../osv_test.patch
 	mv ROOTFS/osv_test/Gemfile ROOTFS/osv_test/Gemfile.old
 	grep -v spring ROOTFS/osv_test/Gemfile.old > ROOTFS/osv_test/Gemfile
