@@ -1,6 +1,8 @@
 .PHONY: module
 module: ROOTFS usr.manifest
 
+RAILS_VER=4.1.6
+
 sqlite-autoconf-3080500.tar.gz:
 	wget "http://www.sqlite.org/2014/sqlite-autoconf-3080500.tar.gz"
 
@@ -12,7 +14,8 @@ sqlite-autoconf-3080500/.libs/libsqlite3.so.0.8.6: sqlite-autoconf-3080500
 ROOTFS/libsqlite3.so.0: sqlite-autoconf-3080500/.libs/libsqlite3.so.0.8.6
 	cp sqlite-autoconf-3080500/.libs/libsqlite3.so.0.8.6 ROOTFS/libsqlite3.so.0
 tmp/bin/rails: 
-	GEM_HOME=tmp gem install --no-ri --no-rdoc rails railties
+	GEM_HOME=tmp gem install --no-ri --no-rdoc rails -v ${RAILS_VER}
+	GEM_HOME=tmp gem install --no-ri --no-rdoc railties -v ${RAILS_VER}
 tmp/bin/bundle: 
 	GEM_HOME=tmp gem install --no-ri --no-rdoc bundler
 ROOTFS/osv_test: tmp/bin/rails tmp/bin/bundle
