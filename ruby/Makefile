@@ -3,7 +3,7 @@ module: ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
-SSL_VER=1.0.1h
+SSL_VER=1.0.1i
 OPENSSL=upstream/openssl-${SSL_VER}/apps/openssl
 
 RUBY_LDFLAGS=-lm -lcrypt -ldl -lpthread -lruby
