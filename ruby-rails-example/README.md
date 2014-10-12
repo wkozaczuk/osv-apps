@@ -20,7 +20,7 @@ pacman -S sqlite
 And you also need suggest image when you build OSv
 
 ```
-make image=ruby-rails
+make image=ruby-rails-example
 ```
 
 ## Running OSv
