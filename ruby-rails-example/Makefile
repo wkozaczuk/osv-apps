@@ -24,9 +24,9 @@ ROOTFS/osv_test: tmp/bin/rails tmp/bin/bundle
 	echo "gem 'therubyracer',  platforms: :ruby" >> ROOTFS/osv_test/Gemfile
 ROOTFS/osv_test/vendor/bundle: ROOTFS/osv_test 
 	cd ROOTFS/osv_test && env GEM_HOME=../../tmp ../../tmp/bin/bundle install --path vendor/bundle
-	cd ROOTFS/osv_test && env GEM_HOME=vendor/bundle/ruby gem install tzinfo-data
+	cd ROOTFS/osv_test && env GEM_HOME=vendor/bundle/ruby/2.1.0 gem install tzinfo-data json
 	cd ROOTFS/osv_test && env GEM_HOME=../../tmp ../../tmp/bin/bundle exec rails g scaffold item name:string price:integer description:text
-	cd ROOTFS/osv_test && env GEM_HOME=vendor/bundle/ruby ./vendor/bundle/ruby/bin/rake db:migrate
+	cd ROOTFS/osv_test && env GEM_HOME=vendor/bundle/ruby/2.1.0 ./vendor/bundle/ruby/2.1.0/bin/rake db:migrate
 ROOTFS: ROOTFS/osv_test/vendor/bundle ROOTFS/libsqlite3.so.0
 
 usr.manifest:
