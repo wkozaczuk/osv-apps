@@ -1,33 +1,28 @@
 # CRuby on OSv
 
-This is a porting CRuby for running some application on OSv.
+This is a porting CRuby for OSv.
 
-## Building
+## Prerequires
 
-You need to install some packages for build CRuby.
+You need to install same version of Ruby on host side, before building CRuby for OSv.
+This is mandatory to keep C extension compatibility.
+You can use version management tool like rvm.
 
-**Fedora**
-
+Example:
 ```
-yum install wget patch ruby-devel openssl-devel
-```
+\curl -sSL https://get.rvm.io | bash -s stable
+source ~/.profile
 
-**Arch Linux**
-```
-pacman -S wget ruby openssl
-```
-
-And you also need suggest image when you build OSv
-
-```
-make image=ruby
+rvm install ruby-2.1.3
 ```
 
-## Running OSv
+## Try irb on OSv
 
-This module has irb
-
-You can launch this command:
+You can try irb by following command:
 ```
 ./scripts/run.py -e '/ruby.so /irb'
 ```
+
+## Sample scripts
+
+You can find more sample scripts on ruby-example module.
