@@ -3,7 +3,9 @@ module: ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
+RUBY_VER=2.1.2
 SSL_VER=1.0.1i
+
 OPENSSL=upstream/openssl-${SSL_VER}/apps/openssl
 
 RUBY_LDFLAGS=-lm -lcrypt -ldl -lpthread -lruby
@@ -23,7 +25,7 @@ EXT_DIGEST_SHA2=upstream/ruby/ext/digest/sha2/Makefile.orig
 
 upstream/ruby:
 	mkdir -p upstream
-	cd upstream && git clone --depth 1 -b v2_1_2 https://github.com/ruby/ruby.git && cd ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
+	cd upstream && git clone --depth 1 -b v$(subst .,_,${RUBY_VER}) https://github.com/ruby/ruby.git && cd ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
 	cd upstream/ruby && autoconf
 	cd upstream/ruby && ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc
 
