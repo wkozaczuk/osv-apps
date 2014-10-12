@@ -1,5 +1,5 @@
-.PHONY: module
-module: ruby.so usr.manifest
+.PHONY: module version_check
+module: version_check ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
@@ -22,6 +22,9 @@ EXT_DIGEST_MD5=upstream/ruby/ext/digest/md5/Makefile.orig
 EXT_DIGEST_RMD160=upstream/ruby/ext/digest/rmd160/Makefile.orig
 EXT_DIGEST_SHA1=upstream/ruby/ext/digest/sha1/Makefile.orig
 EXT_DIGEST_SHA2=upstream/ruby/ext/digest/sha2/Makefile.orig
+
+version_check:
+	test 1 == `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l`
 
 upstream/ruby:
 	mkdir -p upstream
