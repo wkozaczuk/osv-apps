@@ -38,7 +38,7 @@ ed -s deps/uv/src/unix/thread.c << EOF
 w
 EOF
 
-ed -s deps/uv/include/uv-private/uv-unix.h <<EOF
+ed -s "$(find deps/uv -name uv-unix.h)" <<EOF
 /#if defined(__APPLE/a
 #endif
 #if 1
