@@ -24,7 +24,7 @@ EXT_DIGEST_SHA1=upstream/ruby/ext/digest/sha1/Makefile.orig
 EXT_DIGEST_SHA2=upstream/ruby/ext/digest/sha2/Makefile.orig
 
 version_check:
-	test 1 == `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l`
+	@test 1 == `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l` || (echo "Please install ruby ${RUBY_VER}." && exit 1)
 
 upstream/ruby:
 	mkdir -p upstream
