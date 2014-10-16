@@ -24,6 +24,7 @@ default = api.run_java(
 #       '-XX:+CMSParallelInitialMarkEnabled',
 #       '-XX:+CMSEdenChunksRecordAlways',
         '-XX:+UseCondCardMark',
+        '-Djava.rmi.server.hostname=$OSV_IP',
         '-Djava.net.preferIPv4Stack=true',
         '-Dcom.sun.management.jmxremote.port=7199',
         '-Dcom.sun.management.jmxremote.rmi.port=7199',
