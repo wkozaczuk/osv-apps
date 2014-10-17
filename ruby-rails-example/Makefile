@@ -25,7 +25,6 @@ ROOTFS/osv_test: tmp/bin/rails tmp/bin/bundle
 	mv ROOTFS/osv_test/Gemfile ROOTFS/osv_test/Gemfile.old
 	grep -v spring ROOTFS/osv_test/Gemfile.old > ROOTFS/osv_test/Gemfile
 	echo "gem 'therubyracer',  platforms: :ruby" >> ROOTFS/osv_test/Gemfile
-	echo "gem 'thin'" >> ROOTFS/osv_test/Gemfile
 ROOTFS/osv_test/vendor/bundle: ROOTFS/osv_test 
 	cd ROOTFS/osv_test && env GEM_HOME=../../tmp ../../tmp/bin/bundle install --path vendor/bundle
 	cd ROOTFS/osv_test && env GEM_HOME=vendor/bundle/ruby/2.1.0 gem install tzinfo-data json
