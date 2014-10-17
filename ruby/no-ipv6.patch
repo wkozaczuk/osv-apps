@@ -1,0 +1,45 @@
+diff --git a/ext/socket/getaddrinfo.c b/ext/socket/getaddrinfo.c
+index a17d12b..0279577 100644
+--- a/ext/socket/getaddrinfo.c
++++ b/ext/socket/getaddrinfo.c
+@@ -49,8 +49,10 @@
+ # include <net/socket.h>
+ #else
+ # include <sys/socket.h>
++#undef AF_INET6
+ #endif
+ #include <netinet/in.h>
++#undef IPPROTO_IPV6
+ #if defined(HAVE_ARPA_INET_H)
+ #include <arpa/inet.h>
+ #endif
+diff --git a/ext/socket/getnameinfo.c b/ext/socket/getnameinfo.c
+index 4da9680..a574f5a 100644
+--- a/ext/socket/getnameinfo.c
++++ b/ext/socket/getnameinfo.c
+@@ -45,8 +45,10 @@
+ # include <net/socket.h>
+ #else
+ # include <sys/socket.h>
++#undef AF_INET6
+ #endif
+ #include <netinet/in.h>
++#undef IPPROTO_IPV6
+ #if defined(HAVE_ARPA_INET_H)
+ #include <arpa/inet.h>
+ #endif
+diff --git a/ext/socket/rubysocket.h b/ext/socket/rubysocket.h
+index a4893d9..7325f64 100644
+--- a/ext/socket/rubysocket.h
++++ b/ext/socket/rubysocket.h
+@@ -31,8 +31,10 @@
+ #    include <net/socket.h>
+ #  else
+ #    include <sys/socket.h>
++#undef AF_INET6
+ #  endif
+ #  include <netinet/in.h>
++#undef IPPROTO_IPV6
+ #  ifdef HAVE_NETINET_IN_SYSTM_H
+ #    include <netinet/in_systm.h>
+ #  endif
