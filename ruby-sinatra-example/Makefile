@@ -6,7 +6,6 @@ SINATRA_VER=1.4.5
 ROOTFS/sinatra/gems:
 	mkdir -p ROOTFS/sinatra/gems
 	GEM_HOME=ROOTFS/sinatra/gems gem install sinatra -v ${SINATRA_VER}
-	GEM_HOME=ROOTFS/sinatra/gems gem install thin
 
 ROOTFS/sinatra/example.rb:
 	mkdir -p ROOTFS/sinatra
