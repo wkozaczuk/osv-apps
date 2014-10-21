@@ -32,7 +32,7 @@ upstream/ruby:
 	cd upstream/ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
 	cd upstream/ruby && patch -p1 < ../../no-ipv6.patch
 	cd upstream/ruby && autoconf
-	cd upstream/ruby && ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc
+	cd upstream/ruby && ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc --disable-ipv6
 
 upstream/obstack-1.2.tar.bz2:
 	mkdir -p upstream
