@@ -1,0 +1,24 @@
+--- ROOTFS/chat-example/node_modules/socket.io/node_modules/engine.io/node_modules/ws/lib/Receiver.js.orig	2013-07-02 20:04:19.000000000 +0900
++++ ROOTFS/chat-example/node_modules/socket.io/node_modules/engine.io/node_modules/ws/lib/Receiver.js	2014-10-25 02:44:17.218251886 +0900
+@@ -390,10 +390,6 @@
+       if (packet != null) this.currentMessage.push(packet);
+       if (this.state.lastFragment) {
+         var messageBuffer = this.concatBuffers(this.currentMessage);
+-        if (!Validation.isValidUTF8(messageBuffer)) {
+-          this.error('invalid utf8 sequence', 1007);
+-          return;
+-        }
+         this.ontext(messageBuffer.toString('utf8'), {masked: this.state.masked, buffer: messageBuffer});
+         this.currentMessage = [];
+       }
+@@ -500,10 +496,6 @@
+       var message = '';
+       if (data && data.length > 2) {
+         var messageBuffer = data.slice(2);
+-        if (!Validation.isValidUTF8(messageBuffer)) {
+-          self.error('invalid utf8 sequence', 1007);
+-          return;
+-        }
+         message = messageBuffer.toString('utf8');
+       }
+       this.onclose(code, message, {masked: self.state.masked});
