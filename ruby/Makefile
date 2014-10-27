@@ -1,4 +1,4 @@
-.PHONY: module version_check
+.PHONY: module version_check test clean
 module: version_check ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
@@ -119,6 +119,8 @@ ROOTFS: module
 	sh tmp.sh
 	rm tmp.sh
 
-.PHONY: clean
+test:
+	python test.py
+
 clean:
 	rm -rf upstream *.o *.so usr.manifest ROOTFS
