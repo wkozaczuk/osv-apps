@@ -1,4 +1,4 @@
-.PHONY: module
+.PHONY: module test clean
 module: ROOTFS usr.manifest
 
 PUBLIFY_VER=v8.0.2
@@ -50,6 +50,9 @@ usr.manifest:
 	echo '/libsqlite3.so.0: $${MODULE_DIR}/sqlite-autoconf-3080500/.libs/libsqlite3.so.0.8.6' >> usr.manifest
 	find ROOTFS/publify/vendor/bundle -name '*.so' -exec ldd {} \;|awk '{print $$1,":",$$3}'|grep "/lib64"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|grep -v "libstdc++"|grep -v "libgcc_s"|grep -v "librt"|grep -v "sqlite3"|grep -v "libssl.so"|sort|uniq|sed -e "s/ //" \
 		>> usr.manifest
-	
+
+test:
+	python test.py
+
 clean:
 	rm -rf usr.manifest sqlite-autoconf-3080500 *.tar.gz ROOTFS tmp publify
