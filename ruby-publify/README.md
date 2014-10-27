@@ -14,3 +14,13 @@ yum install sqlite-devel
 ```
 pacman -S sqlite
 ```
+
+## Browser test prerequires
+
+**Fedora**
+
+```
+yum install firefox python-pip xorg-x11-server-Xvfb
+pip install selenium
+```
+

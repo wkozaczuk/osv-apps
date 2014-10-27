@@ -1,4 +1,4 @@
-.PHONY: module test clean
+.PHONY: module test browser_test clean
 module: ROOTFS usr.manifest
 
 PUBLIFY_VER=v8.0.2
@@ -53,6 +53,11 @@ usr.manifest:
 
 test:
 	python test.py
+
+browser_test:
+	Xvfb :1 -screen 0 1024x768x24 &
+	env DISPLAY=:1 python browser_test.py
+	killall Xvfb
 
 clean:
 	rm -rf usr.manifest sqlite-autoconf-3080500 *.tar.gz ROOTFS tmp publify
