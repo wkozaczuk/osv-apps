@@ -1,0 +1,53 @@
+--- /tmp/lib_ti.c	2014-10-27 10:55:30.852317186 +0200
++++ upstream/ncurses-5.9/ncurses/tinfo/lib_ti.c	2014-10-27 10:56:49.223858736 +0200
+@@ -53,7 +53,7 @@
+ NCURSES_SP_NAME(tigetflag) (NCURSES_SP_DCLx NCURSES_CONST char *str)
+ {
+     int result = ABSENT_BOOLEAN;
+-    int i, j;
++    int i, j = -1;
+ 
+     T((T_CALLED("tigetflag(%p, %s)"), (void *) SP_PARM, str));
+ 
+@@ -67,7 +67,6 @@
+ 	}
+ #if NCURSES_XNAMES
+ 	else {
+-	    j = -1;
+ 	    for_each_ext_boolean(i, tp) {
+ 		const char *capname = ExtBoolname(tp, i, boolnames);
+ 		if (same_name(str, capname)) {
+@@ -97,7 +96,7 @@
+ NCURSES_EXPORT(int)
+ NCURSES_SP_NAME(tigetnum) (NCURSES_SP_DCLx NCURSES_CONST char *str)
+ {
+-    int i, j;
++    int i, j = -1;
+     int result = CANCELLED_NUMERIC;	/* Solaris returns a -1 on error */
+ 
+     T((T_CALLED("tigetnum(%p, %s)"), (void *) SP_PARM, str));
+@@ -112,7 +111,6 @@
+ 	}
+ #if NCURSES_XNAMES
+ 	else {
+-	    j = -1;
+ 	    for_each_ext_number(i, tp) {
+ 		const char *capname = ExtNumname(tp, i, numnames);
+ 		if (same_name(str, capname)) {
+@@ -145,7 +143,7 @@
+ NCURSES_SP_NAME(tigetstr) (NCURSES_SP_DCLx NCURSES_CONST char *str)
+ {
+     char *result = CANCELLED_STRING;
+-    int i, j;
++    int i, j = -1;
+ 
+     T((T_CALLED("tigetstr(%p, %s)"), (void *) SP_PARM, str));
+ 
+@@ -159,7 +157,6 @@
+ 	}
+ #if NCURSES_XNAMES
+ 	else {
+-	    j = -1;
+ 	    for_each_ext_string(i, tp) {
+ 		const char *capname = ExtStrname(tp, i, strnames);
+ 		if (same_name(str, capname)) {
