@@ -9,12 +9,12 @@
 
 jvm_dir=install/usr/lib/jvm
 
-version=1.8.0.40-11.b02.fc22
+version=1.8.0.40-12.b02.fc22
 java_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/j/
 java_fullname=java-1.8.0-openjdk-headless-$(version).x86_64.rpm
 
 tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
-tzdata_fullname=tzdata-java-2014g-1.fc22.noarch.rpm
+tzdata_fullname=tzdata-java-2014i-1.fc22.noarch.rpm
 
 upstream/$(java_fullname):
 	mkdir -p upstream
