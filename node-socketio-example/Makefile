@@ -1,4 +1,4 @@
-.PHONY: module test clean
+.PHONY: module test browser_test clean
 module: ROOTFS
 
 ROOTFS: ROOTFS/chat-example
@@ -11,6 +11,11 @@ ROOTFS/chat-example:
 
 test:
 	python test.py
+
+browser_test:
+	Xvfb :1 -screen 0 1024x768x24 &
+	env DISPLAY=:1 python browser_test.py
+	killall Xvfb
 
 clean:
 	rm -rf ROOTFS
