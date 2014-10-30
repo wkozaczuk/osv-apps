@@ -36,7 +36,7 @@ ROOTFS/publify/bin/rails:
 	cp rails ROOTFS/publify/bin
 
 ROOTFS/publify/vendor/bundle: ROOTFS/publify ROOTFS/publify/config/database.yml ROOTFS/publify/config/environments/production.rb ROOTFS/publify/vendor/bundle/ruby/2.1.0/bin/rake ROOTFS/publify/bin/rails
-	cd ROOTFS/publify && env GEM_HOME=../../tmp ../../tmp/bin/bundle install --path vendor/bundle
+	cd ROOTFS/publify && env GEM_HOME=../../tmp PATH=../../tmp/bin:$$PATH ../../tmp/bin/bundle install --path vendor/bundle
 	cd ROOTFS/publify && env GEM_HOME=vendor/bundle/ruby/2.1.0 gem install tzinfo-data turbolinks carrierwave addressable bundler json
 	cd ROOTFS/publify && env GEM_HOME=vendor/bundle/ruby/2.1.0 gem install will_paginate -v 3.0.pre4
 	cd ROOTFS/publify && env GEM_HOME=vendor/bundle/ruby/2.1.0 vendor/bundle/ruby/2.1.0/bin/rake db:create RAILS_ENV=production
