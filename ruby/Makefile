@@ -3,8 +3,8 @@ module: version_check ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
-RUBY_VER=2.1.3
-SSL_VER=1.0.1i
+RUBY_VER=2.1.4
+SSL_VER=1.0.1j
 
 OPENSSL=upstream/openssl-${SSL_VER}/apps/openssl
 
