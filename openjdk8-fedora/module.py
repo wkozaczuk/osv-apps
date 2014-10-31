@@ -17,7 +17,7 @@ api.require('libz')
 api.require('josvsym')
 
 usr_files = FileMap()
-usr_files.add('${OSV_BASE}/apps/openjdk8-fedora/install').to('/')
+usr_files.add('${OSV_BASE}/apps/openjdk8-fedora/install').to('/').allow_symlink()
 usr_files.add('${OSV_BASE}/apps/openjdk8-fedora/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
