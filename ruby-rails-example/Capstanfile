@@ -1,5 +1,5 @@
 base: ruby
 
-cmdline: --cwd=/osv_test/ --env=GEM_HOME=/osv_test/vendor/bundle/ruby /ruby.so ./bin/rails server
+cmdline: --cwd=/osv_test/ /ruby.so ./bin/rails server
 
 build: make
