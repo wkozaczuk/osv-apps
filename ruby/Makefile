@@ -31,6 +31,7 @@ upstream/ruby:
 	cd upstream && git clone --depth 1 -b v$(subst .,_,${RUBY_VER}) https://github.com/ruby/ruby.git
 	cd upstream/ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
 	cd upstream/ruby && patch -p1 < ../../no-ipv6.patch
+	cd upstream/ruby && patch -p1 < ../../disable-fstat.patch
 	cd upstream/ruby && autoconf
 	cd upstream/ruby && ./configure --libdir=/usr/lib --enable-pic --enable-shared --disable-install-doc --disable-install-rdoc --disable-ipv6
 

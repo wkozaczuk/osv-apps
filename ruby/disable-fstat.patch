@@ -1,0 +1,16 @@
+diff --git a/io.c b/io.c
+index 9522990..3610b39 100644
+--- a/io.c
++++ b/io.c
+@@ -185,9 +185,11 @@ rb_update_max_fd(int fd)
+     struct stat buf;
+     rb_atomic_t afd = (rb_atomic_t)fd;
+
++#if 0
+     if (fstat(fd, &buf) != 0 && errno == EBADF) {
+         rb_bug("rb_update_max_fd: invalid fd (%d) given.", fd);
+     }
++#endif
+
+     while (max_file_descriptor < afd) {
+	ATOMIC_CAS(max_file_descriptor, max_file_descriptor, afd);
