@@ -9,12 +9,13 @@
 
 jvm_dir=install/usr/lib/jvm
 
-version=1.8.0.40-12.b02.fc22
+java_version=$(shell ./latest.sh java-1.8.0-openjdk-headless x86_64)
 java_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/j/
-java_fullname=java-1.8.0-openjdk-headless-$(version).x86_64.rpm
+java_fullname=java-1.8.0-openjdk-headless-$(java_version).x86_64.rpm
 
+tzdata_version=$(shell ./latest.sh tzdata-java noarch)
 tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
-tzdata_fullname=tzdata-java-2014i-1.fc22.noarch.rpm
+tzdata_fullname=tzdata-java-$(tzdata_version).noarch.rpm
 
 upstream/$(java_fullname):
 	mkdir -p upstream
@@ -28,7 +29,7 @@ module: upstream/$(java_fullname) upstream/$(tzdata_fullname)
 	rm -rf install
 	mkdir -p install
 	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id)
-	ln -sf java-1.8.0-openjdk-$(version).x86_64 $(jvm_dir)/java
+	ln -sf java-1.8.0-openjdk-$(java_version).x86_64 $(jvm_dir)/java
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
 	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id)
