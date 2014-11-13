@@ -13,13 +13,21 @@ op.add_option('-m', '--metric', metavar='NAME',
 
 options, args = op.parse_args()
 
+def iter_results(lines):
+    i = iter(lines)
+    while True:
+        line = next(i)
+        if line.startswith('[ ID]'):
+            line = next(i)
+            print('processing {}\n'.format(line))
+            yield line[5:].split()[4]
+
 with open(args[0]) as f:
-    line = f.readline()
-    while not line.startswith('[ ID]'):
-        line = f.readline()
-    line = f.readline()
-    print('processing {}\n'.format(line))
-    result = line[5:].split()[4]
+    results = list(iter_results(f))
+    if not results:
+        print 'No results found'
+        sys.exit(1)
+    result = results[0]
 
 def add_time(parent, name):
     e = ET.SubElement(parent, name)
