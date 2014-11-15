@@ -1,5 +1,5 @@
 How to run Minecraft Server:
-$ ./GEN
+$ ./GET
 Check EULA
 
 $ java -Xmx1024M -Xmx1024M -jar minecraft_server.1.7.10.jar nogui
