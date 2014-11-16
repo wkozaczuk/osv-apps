@@ -8,11 +8,13 @@ This is a porting of Publify.
 
 ```
 yum install sqlite-devel
+gem install bundler
 ```
 
 **Arch Linux**
 ```
 pacman -S sqlite
+gem install bundler
 ```
 
 ## Browser test prerequires
