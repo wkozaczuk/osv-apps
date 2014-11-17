@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
-MAJOR=7
-VERSION=${MAJOR}.0.54
+MAJOR=8
+VERSION=${MAJOR}.0.15
 
 dir=apache-tomcat-$VERSION
 archive=$dir.tar.gz
