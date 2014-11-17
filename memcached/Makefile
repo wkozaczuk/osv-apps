@@ -10,7 +10,7 @@ src:
 	./GET
 
 sources := assoc.c cache.c daemon.c hash.c items.c memcached.c slabs.c \
-	stats.c thread.c util.c
+	stats.c thread.c util.c jenkins_hash.c murmur3_hash.c
 
 sources := $(addprefix src/, $(sources))
 

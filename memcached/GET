@@ -1,6 +1,6 @@
 # Build an src/ directory from the upstream memcached.
 set -e
-VERSION=1.4.17
+VERSION=1.4.21
 
 mkdir src
 mkdir upstream
@@ -16,7 +16,8 @@ for i in \
 	assoc.c config.h items.c protocol_binary.h stats.c util.c \
 	assoc.h daemon.c items.h sasl_defs.h stats.h util.h \
 	cache.c hash.c memcached.c slabs.c thread.c \
-        cache.h hash.h memcached.h slabs.h trace.h
+        cache.h hash.h memcached.h slabs.h trace.h \
+	jenkins_hash.h jenkins_hash.c murmur3_hash.h murmur3_hash.c
 do
 	cp upstream/memcached-$VERSION/$i src/$i
 done
