@@ -13,7 +13,7 @@ Example:
 \curl -sSL https://get.rvm.io | bash -s stable
 source ~/.profile
 
-rvm install ruby-2.1.4
+rvm install ruby-2.1.5
 ```
 
 ## Try irb on OSv
