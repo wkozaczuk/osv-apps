@@ -15,7 +15,7 @@ options, args = op.parse_args()
 
 with open(args[0]) as f:
     line = f.readline()
-    while not line.startswith('interval_op_rate'):
+    while not line.startswith('op rate'):
         line = f.readline()
     print('processing {}\n'.format(line))
     result = line[5:].split()[2]
