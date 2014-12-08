@@ -3,7 +3,7 @@
 OTP_VERSION=17.3
 
 all: install
-module: instal
+module: install
 
 otp_src_$(OTP_VERSION).tar.gz:
 	wget -O "$@.temp" "http://www.erlang.org/download/otp_src_$(OTP_VERSION).tar.gz"
