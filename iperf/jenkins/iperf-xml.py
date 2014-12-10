@@ -25,7 +25,7 @@ def iter_results(lines):
 with open(args[0]) as f:
     results = list(iter_results(f))
     if not results:
-        print 'No results found'
+        print('No results found')
         sys.exit(1)
     result = results[0]
 
