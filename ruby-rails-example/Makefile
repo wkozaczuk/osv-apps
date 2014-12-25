@@ -25,7 +25,7 @@ ROOTFS/osv_test: tmp/bin/rails
 	echo "gem 'tzinfo'" >> ROOTFS/osv_test/Gemfile
 	echo "gem 'tzinfo-data'" >> ROOTFS/osv_test/Gemfile
 	cd ROOTFS/osv_test && bundle install --standalone
-	cd ROOTFS/osv_test && env GEM_HOME=bundle/ruby/2.1.0 gem install json -v 1.8.1
+	cd ROOTFS/osv_test && env GEM_HOME=bundle/ruby/2.2.0 gem install json -v 1.8.1
 	cd ROOTFS/osv_test && bundle exec rails g scaffold item name:string price:integer description:text
 	cd ROOTFS/osv_test && bundle exec rake db:migrate
 
