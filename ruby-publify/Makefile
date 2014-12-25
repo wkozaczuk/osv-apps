@@ -26,10 +26,11 @@ ROOTFS/publify/bin/rails:
 
 ROOTFS/publify/vendor/bundle: ROOTFS/publify  ROOTFS/publify/bin/rails
 	cp database.yml ROOTFS/publify/config/database.yml
+	cp development.rb ROOTFS/publify/config/environments/development.rb
 	cd ROOTFS/publify && echo "gem 'tzinfo'" >> Gemfile
 	cd ROOTFS/publify && echo "gem 'tzinfo-data'" >> Gemfile
 	cd ROOTFS/publify && bundle install --standalone
-	cd ROOTFS/publify && env GEM_HOME=bundle/ruby/2.1.0 gem install json -v 1.8.1
+	cd ROOTFS/publify && env GEM_HOME=bundle/ruby/2.2.0 gem install json -v 1.8.1
 	cd ROOTFS/publify && bundle exec rake db:create
 	cd ROOTFS/publify && bundle exec rake db:migrate
 	cd ROOTFS/publify && bundle exec rake db:seed
