@@ -9,6 +9,7 @@ cd upstream
 wget https://github.com/antirez/redis/archive/$VERSION.tar.gz
 tar zxvf $VERSION.tar.gz
 cd redis-$VERSION
+patch -p0 -N < ../../patch
 # TODO: The top-level make's "-r" option breaks redis's inner makefiles.
 # MAKEFLAGS should probably have been unset before calling us, not here.
 unset MAKEFLAGS
