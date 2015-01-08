@@ -17,15 +17,10 @@ tzdata_version=$(shell ./latest.sh tzdata-java noarch)
 tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
 tzdata_fullname=tzdata-java-$(tzdata_version).noarch.rpm
 
-upstream/$(java_fullname):
+module:
 	mkdir -p upstream
-	wget -O upstream/$(java_fullname) $(java_dir)$(java_fullname)
-
-upstream/$(tzdata_fullname):
-	mkdir -p upstream
-	wget -O upstream/$(tzdata_fullname) $(tzdata_dir)$(tzdata_fullname)
-
-module: upstream/$(java_fullname) upstream/$(tzdata_fullname)
+	wget -c -O upstream/$(java_fullname) $(java_dir)$(java_fullname)
+	wget -c -O upstream/$(tzdata_fullname) $(tzdata_dir)$(tzdata_fullname)
 	rm -rf install
 	mkdir -p install
 	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id)
