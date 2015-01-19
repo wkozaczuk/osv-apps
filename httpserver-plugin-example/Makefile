@@ -88,4 +88,5 @@ clean:
 
 
 usr.manifest:
-	echo '/usr/mgmt/plugins/plugin.so: $${MODULE_DIR}/plugin.so' > usr.manifest
+	echo '/usr/mgmt/api/listings/plugin.json: $${MODULE_DIR}/api-doc/listings/plugin.json' > usr.manifest
+	echo '/usr/mgmt/plugins/plugin.so: $${MODULE_DIR}/plugin.so' >> usr.manifest
