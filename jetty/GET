@@ -2,7 +2,7 @@
 set -ex
 mkdir upstream
 cd upstream
-wget "http://download.eclipse.org/jetty/stable-9/dist/jetty-distribution-9.2.6.v20141205.tar.gz" -O jetty.tgz
+wget "http://eclipse.org/downloads/download.php?file=/jetty/9.2.5.v20141112/dist/jetty-distribution-9.2.5.v20141112.tar.gz&r=1" -O jetty.tgz
 tar zxvf jetty.tgz --strip-components=1
 sed '/<!--$/d;/^ *-->$/d' demo-base/webapps/test.d/override-web.xml >/tmp/$$.xml
 mv /tmp/$$.xml demo-base/webapps/test.d/override-web.xml
