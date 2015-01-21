@@ -3,3 +3,6 @@ module: upstream
 
 upstream:
 	./GET
+
+clean:
+	-rm -rf upstream
