@@ -26,7 +26,7 @@ build: echo "build"
 # List of files that are included in the generated image.
 #
 files:
-  /dropwizard-example.jar: dropwizard/dropwizard-example/target/dropwizard-example-0.8.0-SNAPSHOT.jar
+  /dropwizard-example.jar: dropwizard/dropwizard-example/target/dropwizard-example-0.8.0-rc3-SNAPSHOT.jar
   /example.mv.db: dropwizard/dropwizard-example/target/example.mv.db
   /example.yml: dropwizard/dropwizard-example/example.yml
   /example.keystore: dropwizard/dropwizard-example/example.keystore
