@@ -24,7 +24,7 @@ EXT_DIGEST_SHA1=upstream/ruby/ext/digest/sha1/Makefile.orig
 EXT_DIGEST_SHA2=upstream/ruby/ext/digest/sha2/Makefile.orig
 
 version_check:
-	@test 1 == `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l` || (echo "Please install ruby ${RUBY_VER}." && exit 1)
+	@test 1 -eq `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l` || (echo "Please install ruby ${RUBY_VER}." && exit 1)
 
 upstream/ruby:
 	mkdir -p upstream
@@ -88,7 +88,7 @@ ${EXT_DIGEST_SHA2}: ${LIBRUBY} ${OPENSSL}
 
 ruby.so: ${LIBOBSTACK_A} ${LIBRUBY}
 	cc ${CFLAGS} -c ${INCS} upstream/ruby/main.c 
-	cc ${CFLAGS} -o ruby.so ${LIBS} ${RUBY_LDFLAGS} ./main.o ${OBSTACK_OBJS}
+	cc ${CFLAGS} -o ruby.so ./main.o ${OBSTACK_OBJS} ${LIBS} ${RUBY_LDFLAGS}
 
 usr.manifest: ruby.so upstream/bundler upstream/cert.pem ${OPENSSL} ${EXT_OPENSSL} ${EXT_DIGEST_MD5} ${EXT_DIGEST_RMD160} ${EXT_DIGEST_SHA1} ${EXT_DIGEST_SHA2}
 	cp -a ./upstream/ruby/.ext/common/* ./upstream/ruby/lib/
