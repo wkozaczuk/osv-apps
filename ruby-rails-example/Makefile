@@ -2,6 +2,7 @@
 module: ROOTFS usr.manifest
 
 RAILS_VER=4.1.7
+JSON_VER=1.8.2
 
 sqlite-autoconf-3080500.tar.gz:
 	wget "http://www.sqlite.org/2014/sqlite-autoconf-3080500.tar.gz"
@@ -25,7 +26,7 @@ ROOTFS/osv_test: tmp/bin/rails
 	echo "gem 'tzinfo'" >> ROOTFS/osv_test/Gemfile
 	echo "gem 'tzinfo-data'" >> ROOTFS/osv_test/Gemfile
 	cd ROOTFS/osv_test && bundle install --standalone
-	cd ROOTFS/osv_test && env GEM_HOME=bundle/ruby/2.2.0 gem install json -v 1.8.1
+	cd ROOTFS/osv_test && env GEM_HOME=bundle/ruby/2.2.0 gem install json -v ${JSON_VER}
 	cd ROOTFS/osv_test && bundle exec rails g scaffold item name:string price:integer description:text
 	cd ROOTFS/osv_test && bundle exec rake db:migrate
 
