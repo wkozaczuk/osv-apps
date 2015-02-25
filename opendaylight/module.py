@@ -2,4 +2,26 @@ from osv.modules import api
 
 api.require('java')
 
-default = api.run("--cwd=/opendaylight /java.so -Dfelix.fileinstall.filter=^(?!org.opendaylight.(openflowplugin|openflowjava)).* -Djava.io.tmpdir=/opendaylight/work/tmp -Dosgi.install.area=/opendaylight -Dosgi.configuration.area=/opendaylight/configuration -Dosgi.frameworkClassPath=file:/opendaylight/lib/org.eclipse.osgi-3.8.1.v20120830-144521.jar,file:/opendaylight/lib/org.eclipse.virgo.kernel.equinox.extensions-3.6.0.RELEASE.jar,file:/opendaylight/lib/org.eclipse.equinox.launcher-1.3.0.v20120522-1813.jar -Dosgi.framework=file:/opendaylight/lib/org.eclipse.osgi-3.8.1.v20120830-144521.jar -Djava.awt.headless=true -classpath /opendaylight/lib/org.eclipse.osgi-3.8.1.v20120830-144521.jar:/opendaylight/lib/org.eclipse.virgo.kernel.equinox.extensions-3.6.0.RELEASE.jar:/opendaylight/lib/org.eclipse.equinox.launcher-1.3.0.v20120522-1813.jar org.eclipse.equinox.launcher.Main -console -consoleLog")
+default = api.run(
+    "--cwd=/opendaylight"
+    "/java.so"
+    "-Xms128M"
+    "-Xmx2048m"
+    "-XX:+UnlockDiagnosticVMOptions"
+    "-XX:+UnsyncloadClass"
+    "-XX:MaxPermSize=512m"
+    "-Dcom.sun.management.jmxremote"
+    "-Djava.endorsed.dirs=/opendaylight/lib/endorsed"
+    "-Djava.ext.dirs=/usr/lib/jvm/java/jre/lib/ext:/usr/java/packages/lib/ext:/opendaylight/lib/ext"
+    "-Dkaraf.instances=/opendaylight/instances"
+    "-Dkaraf.home=/opendaylight"
+    "-Dkaraf.base=/opendaylight"
+    "-Dkaraf.data=/opendaylight/data"
+    "-Dkaraf.etc=/opendaylight/etc"
+    "-Djava.io.tmpdir=/opendaylight/data/tmp"
+    "-Djava.util.logging.config.file=/opendaylight/etc/java.util.logging.properties"
+    "-Dkaraf.startLocalConsole=true"
+    "-Dkaraf.startRemoteShell=true"
+    "-classpath /opendaylight/lib/karaf.branding-1.0.2-Helium-SR2.jar:/opendaylight/lib/karaf-jaas-boot.jar:/opendaylight/lib/karaf.jar:/opendaylight/lib/karaf-jmx-boot.jar:/opendaylight/lib/karaf-org.osgi.core.jar"
+    "org.apache.karaf.main.Main"
+)
