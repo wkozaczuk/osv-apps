@@ -22,6 +22,6 @@ default = api.run(
     "-Djava.util.logging.config.file=/opendaylight/etc/java.util.logging.properties"
     "-Dkaraf.startLocalConsole=true"
     "-Dkaraf.startRemoteShell=true"
-    "-classpath /opendaylight/lib/karaf.branding-1.0.2-Helium-SR2.jar:/opendaylight/lib/karaf-jaas-boot.jar:/opendaylight/lib/karaf.jar:/opendaylight/lib/karaf-jmx-boot.jar:/opendaylight/lib/karaf-org.osgi.core.jar"
+    "-classpath /opendaylight/lib/karaf.branding-1.0.3-Helium-SR3.jar:/opendaylight/lib/karaf-jaas-boot.jar:/opendaylight/lib/karaf.jar:/opendaylight/lib/karaf-jmx-boot.jar:/opendaylight/lib/karaf-org.osgi.core.jar"
     "org.apache.karaf.main.Main"
 )
