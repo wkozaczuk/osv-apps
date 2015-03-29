@@ -5,25 +5,24 @@ DIR:=$(NAME)-$(VERSION)-bin-hadoop$(HADOOP_VERSION)
 TARBALL:=$(DIR).tgz
 URL:=http://d3kbcqa49mib13.cloudfront.net/$(TARBALL)
 
-.PHONY: module
 
-module: ROOTFS
+module: ROOTFS usr.manifest
 
 $(TARBALL):
 	wget $(URL)
 
-$(NAME): $(TARBALL)
+ROOTFS/$(NAME): $(TARBALL)
 	tar xvf $(TARBALL)
-
-ROOTFS/$(NAME): $(NAME)
 	mkdir -p ROOTFS
 	mv $(DIR) ROOTFS/$(NAME)
+	touch ROOTFS/$(NAME)
 	find ./assets/conf -type f -exec cp {} ROOTFS/$(NAME)/conf/. \;
 
-manifest:
+usr.manifest:
 	echo "/$(NAME)/**: \$${MODULE_DIR}/ROOTFS/$(NAME)/**" > usr.manifest
 
 clean:
-	rm -rf ROOTFS usr.manifest
+	rm -rf ROOTFS $(DIR)
+	rm -f usr.manifest $(TARBALL)
 
-ROOTFS: clean manifest ROOTFS/$(NAME)
+ROOTFS: ROOTFS/$(NAME)
