@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 rm -rf dpdk ROOTFS
-git clone -b osv-head --max-depth 1 https://github.com/syuu1228/dpdk.git
+git clone -b osv-head --depth 1 https://github.com/syuu1228/dpdk.git
 cd dpdk
 make install T=x86_64-native-osvapp-gcc OSV_SDK=`readlink -f ../../..`
 (cd examples/cmdline; env RTE_SDK=`readlink -f ../../` RTE_TARGET=x86_64-native-osvapp-gcc make)
