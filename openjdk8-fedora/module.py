@@ -15,6 +15,8 @@ api.require('fonts')
 api.require('ca-certificates')
 api.require('libz')
 api.require('josvsym')
+api.require('httpserver-jolokia-plugin')
+api.require('httpserver-jvm-plugin')
 
 usr_files = FileMap()
 usr_files.add('${OSV_BASE}/apps/openjdk8-fedora/install').to('/').allow_symlink()
