@@ -4,6 +4,7 @@ default = api.run_java(
     jvm_args=[
         '-Xms1G',
         '-Xmx1G',
+        '-Djava.util.logging.config.file=/activemq/conf/logging.properties',
         '-Djava.security.auth.login.config=/activemq/conf/login.config',
         '-Dcom.sun.management.jmxremote',
         '-Djava.awt.headless=true',
