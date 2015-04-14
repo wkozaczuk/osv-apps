@@ -39,7 +39,8 @@ prepare_instance_for_test() {
  fi
 
  echo "=== Create OSv instance ==="
- $SCRIPTS_ROOT/release-ec2.sh --instance-only \
+ $SCRIPTS_ROOT/release-ec2.sh --override-image build/release.x64/osv.raw \
+                              --instance-only \
                               --override-version $TEST_OSV_VER \
                               --region $AWS_REGION \
                               --zone $AWS_ZONE \
@@ -72,6 +73,7 @@ echo "=== Build everything ==="
   || handle_test_error
 
 make -j `nproc` image=netperf img_format=raw || handle_test_error
+scripts/convert raw
 
 prepare_instance_for_test
 echo $TEST_INSTANCE_ID > /tmp/test_instance_id
