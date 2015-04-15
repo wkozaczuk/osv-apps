@@ -1,21 +1,25 @@
-.PHONY: module
-
 VERSION := 0.2.3-Helium-SR3
-URL := https://nexus.opendaylight.org/content/repositories/opendaylight.release/org/opendaylight/integration/distribution-karaf/$(VERSION)/distribution-karaf-$(VERSION).zip
+NAME	:= opendaylight
+DIR		:= distribution-karaf
+TARBALL := $(DIR)-$(VERSION).tar.gz
+URL		:= https://nexus.opendaylight.org/content/groups/public/org/opendaylight/integration/$(DIR)/$(VERSION)/$(TARBALL)
 
-module: ROOTFS
+module: ROOTFS usr.manifest
 
-distribution-karaf-$(VERSION).zip:
+$(TARBALL):
 	wget $(URL)
 
-opendaylight: distribution-karaf-$(VERSION).zip
-	unzip -x distribution-karaf-$(VERSION).zip
+ROOTFS/$(NAME): $(TARBALL)
+	tar xvf $(TARBALL)
+	mkdir -p ROOTFS
+	mv $(DIR)-$(VERSION) ROOTFS/$(NAME)
+	touch ROOTFS/$(NAME)
+	find ./assets/etc -type f -exec cp {} ROOTFS/$(NAME)/etc/. \;
 
-ROOTFS/opendaylight: opendaylight
-	mkdir -p ROOTFS/opendaylight
-	cp -a distribution-karaf-$(VERSION)/bin distribution-karaf-$(VERSION)/configuration distribution-karaf-$(VERSION)/data distribution-karaf-$(VERSION)/deploy distribution-karaf-$(VERSION)/etc distribution-karaf-$(VERSION)/externalapps distribution-karaf-$(VERSION)/lib distribution-karaf-$(VERSION)/version.properties distribution-karaf-$(VERSION)/system ROOTFS/opendaylight
+ROOTFS: ROOTFS/$(NAME)
 
-ROOTFS: ROOTFS/opendaylight
+usr.manifest:
+	echo "/$(NAME)/**: \$${MODULE_DIR}/ROOTFS/$(NAME)/**" > usr.manifest
 
 clean:
 	rm -rf distribution-karaf-$(VERSION) ROOTFS
