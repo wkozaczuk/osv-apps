@@ -22,6 +22,9 @@ compile: configure
 install: compile
 	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) DESTDIR=$(CURDIR)/ROOTFS; make install
 	find ROOTFS -name '*.so' | xargs -I {} ldd {} | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|dl|m|util|rt|pthread).so' | xargs -I {} install -D -T {} ROOTFS{}
+	make -C os_mon
+	mkdir -p $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3
+	cd os_mon; cp --parents -u -r -t $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3 ebin/* src/* priv/*
 
 clean:
 	-rm -rf ROOTFS
