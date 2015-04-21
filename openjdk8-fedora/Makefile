@@ -17,7 +17,10 @@ tzdata_version=$(shell ./latest.sh tzdata-java noarch)
 tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
 tzdata_fullname=tzdata-java-$(tzdata_version).noarch.rpm
 
+SRC = $(shell readlink -f ../..)
+
 module:
+	cd $(SRC)/java && mvn package -q -DskipTests=true
 	mkdir -p upstream
 	wget -c -O upstream/$(java_fullname) $(java_dir)$(java_fullname)
 	wget -c -O upstream/$(tzdata_fullname) $(tzdata_dir)$(tzdata_fullname)
@@ -31,3 +34,5 @@ module:
 
 clean:
 	rm -rf upstream install
+	cd $(SRC)/java && mvn clean -q
+	-rm -f dependency-reduced-pom.xml
