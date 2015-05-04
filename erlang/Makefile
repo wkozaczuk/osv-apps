@@ -24,7 +24,7 @@ install: compile
 	find ROOTFS -name '*.so' | xargs -I {} ldd {} | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|dl|m|util|rt|pthread).so' | xargs -I {} install -D -T {} ROOTFS{}
 	make -C os_mon
 	mkdir -p $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3
-	cd os_mon; cp --parents -u -r -t $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3 ebin/* c_src/* priv/*
+	cd os_mon; cp --parents -u -r -t $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3 ebin/* src/* priv/*
 
 clean:
 	-rm -rf ROOTFS
