@@ -11,9 +11,11 @@ otp_src_$(OTP_VERSION).tar.gz:
 
 otp_src_$(OTP_VERSION): otp_src_$(OTP_VERSION).tar.gz
 	tar xvf "$<"
+	touch otp_src_$(OTP_VERSION)/lib/os_mon/c_src/disksup.c
+	patch -b -p0 < os_mon.patch
 
 configure: otp_src_$(OTP_VERSION)
-	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) CFLAGS=-fpie LDFLAGS=-pie; ./configure -prefix=/usr --libdir=/usr/lib64 --disable-hipe --without-hipe --without-odbc --without-os_mon --enable-builtin-zlib --without-termcap --without-wx --without-erl_interface --without-javac --without-jinterface
+	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) CFLAGS=-fpie LDFLAGS=-pie; ./configure -prefix=/usr --libdir=/usr/lib64 --disable-hipe --without-hipe --without-odbc --enable-builtin-zlib --without-termcap --without-wx --without-erl_interface --without-javac --without-jinterface
 
 compile: configure
 	mkdir -p ROOTFS
@@ -22,9 +24,6 @@ compile: configure
 install: compile
 	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) DESTDIR=$(CURDIR)/ROOTFS; make install
 	find ROOTFS -name '*.so' | xargs -I {} ldd {} | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|dl|m|util|rt|pthread).so' | xargs -I {} install -D -T {} ROOTFS{}
-	make -C os_mon
-	mkdir -p $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3
-	cd os_mon; cp --parents -u -r -t $(CURDIR)/ROOTFS/usr/lib64/erlang/lib/os_mon-2.3 ebin/* src/* priv/*
 
 clean:
 	-rm -rf ROOTFS

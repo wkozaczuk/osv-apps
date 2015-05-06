@@ -1,0 +1,1290 @@
+diff -up otp_src_17.3/lib/os_mon/c_src/disksup.c.orig otp_src_17.3/lib/os_mon/c_src/disksup.c
+--- otp_src_17.3/lib/os_mon/c_src/disksup.c.orig	2015-05-06 14:42:48.469408682 +0800
++++ otp_src_17.3/lib/os_mon/c_src/disksup.c	2015-05-06 14:51:21.278154184 +0800
+@@ -0,0 +1,154 @@
++#include <string.h>
++#include <sys/param.h>
++#include <sys/statvfs.h>
++#include <mntent.h>
++#include <erl_driver.h>
++
++
++struct driver_data {
++  ErlDrvPort port;
++  ErlDrvTermData port_term;
++};
++
++
++struct disk_data {
++  char *disk_path;
++  size_t disk_path_len;
++  size_t disk_size;
++  int disk_usage;
++  struct disk_data *next;
++};
++
++
++struct async_data {
++  struct disk_data *disk_data;
++  size_t entries;
++};
++
++
++static ErlDrvData disksup_start(ErlDrvPort port, char *buff __attribute__((unused)) ) {
++  struct driver_data *driver_data = (struct driver_data *)driver_alloc(sizeof(struct driver_data));
++  driver_data->port = port;
++  driver_data->port_term = driver_mk_port(port);
++  return (ErlDrvData)driver_data;
++}
++
++
++static void disksup_stop(ErlDrvData handle) {
++  driver_free((struct driver_data *)handle);
++}
++
++
++static void disksup_async(void *data) {
++  struct async_data *async_data = (struct async_data *)data;
++  FILE *file = setmntent("/proc/mounts", "r");
++  struct mntent mntent = {0};
++  char buf[MAXPATHLEN * 4] = {0};
++
++  async_data->disk_data = NULL;
++  async_data->entries = 0;
++
++  while (getmntent_r(file, &mntent, buf, sizeof(buf))) {
++    struct disk_data *disk_data;
++    fsblkcnt_t used;
++    fsblkcnt_t total;
++    struct statvfs stat = {0};
++
++    if (statvfs(mntent.mnt_dir, &stat))
++      continue;
++    if (!stat.f_files)
++      continue;
++
++    disk_data = (struct disk_data *)driver_alloc(sizeof(struct disk_data));
++    disk_data->disk_path_len = strlen(mntent.mnt_dir);
++    disk_data->disk_path = (char *)driver_alloc(disk_data->disk_path_len);
++    memcpy(disk_data->disk_path, mntent.mnt_dir, disk_data->disk_path_len);
++    disk_data->disk_size = stat.f_blocks * stat.f_frsize / 1024;
++    used = (stat.f_blocks - stat.f_bfree) * 100;
++    total = stat.f_blocks - stat.f_bfree + stat.f_bavail;
++    disk_data->disk_usage = (used / total) + (used % total > 0);
++
++    disk_data->next = async_data->disk_data;
++    async_data->disk_data = disk_data;
++    async_data->entries++;
++  }
++}
++
++
++static void disksup_output(ErlDrvData handle, char *buff __attribute__((unused)), ErlDrvSizeT bufflen __attribute__((unused))) {
++  struct driver_data *driver_data = (struct driver_data *)handle;
++  struct async_data *async_data = (struct async_data *)driver_alloc(sizeof(struct async_data));
++  driver_async(driver_data->port, NULL, disksup_async, async_data, NULL);
++}
++
++
++static void disksup_ready_async(ErlDrvData handle, ErlDrvThreadData thread_data) {
++  struct driver_data *driver_data = (struct driver_data *)handle;
++  struct async_data *async_data = (struct async_data *)thread_data;
++  struct disk_data *disk_data = async_data->disk_data;
++
++  ErlDrvTermData term[(async_data->entries) * 9 + 7];
++  int i = 0;
++  term[i++] = ERL_DRV_PORT;
++  term[i++] = driver_data->port_term;
++
++  while(disk_data) {
++    term[i++] = ERL_DRV_STRING;
++    term[i++] = (ErlDrvTermData)disk_data->disk_path;
++    term[i++] = disk_data->disk_path_len;
++    term[i++] = ERL_DRV_UINT;
++    term[i++] = disk_data->disk_size;
++    term[i++] = ERL_DRV_INT;
++    term[i++] = disk_data->disk_usage;
++    term[i++] = ERL_DRV_TUPLE;
++    term[i++] = 3;
++    disk_data = disk_data->next;
++  }
++  term[i++] = ERL_DRV_NIL;
++  term[i++] = ERL_DRV_LIST;
++  term[i++] = async_data->entries + 1;
++  term[i++] = ERL_DRV_TUPLE;
++  term[i++] = 2;
++  erl_drv_output_term(driver_data->port_term, term, sizeof(term)/sizeof(ErlDrvTermData));
++
++  disk_data = async_data->disk_data;
++  while(disk_data) {
++    struct disk_data *next_disk_data = disk_data->next;
++    driver_free(disk_data->disk_path);
++    driver_free(disk_data);
++    disk_data = next_disk_data;
++  }
++  driver_free(async_data);
++}
++
++
++ErlDrvEntry disksup_entry = {
++  .init            = NULL,
++  .start           = disksup_start,
++  .stop            = disksup_stop,
++  .output          = disksup_output,
++  .ready_input     = NULL,
++  .ready_output    = NULL,
++  .driver_name     = "disksup",
++  .finish          = NULL,
++  .handle          = NULL,
++  .control         = NULL,
++  .timeout         = NULL,
++  .outputv         = NULL,
++  .ready_async     = disksup_ready_async,
++  .flush           = NULL,
++  .call            = NULL,
++  .event           = NULL,
++  .extended_marker = ERL_DRV_EXTENDED_MARKER,
++  .major_version   = ERL_DRV_EXTENDED_MAJOR_VERSION,
++  .minor_version   = ERL_DRV_EXTENDED_MINOR_VERSION,
++  .driver_flags    = 0,
++  .handle2         = NULL,
++  .process_exit    = NULL,
++  .stop_select     = NULL,
++};
++
++
++DRIVER_INIT(disksup) {
++  return &disksup_entry;
++}
+diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/c_src/Makefile.in
+--- otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/c_src/Makefile.in	2015-05-06 14:34:04.096242053 +0800
+@@ -18,6 +18,7 @@
+ #
+ include $(ERL_TOP)/make/target.mk
+ include $(ERL_TOP)/make/$(TARGET)/otp.mk
++include $(ERL_TOP)/make/$(TARGET)/otp_ded.mk
+ 
+ CC = @CC@
+ LD = @LD@
+@@ -25,6 +26,7 @@ LIBS = @LIBS@
+ CPU_SUP_LIBS = @CPU_SUP_LIBS@
+ 
+ BINDIR = ../priv/bin/$(TARGET)
++LIBDIR = ../priv/lib/$(TARGET)
+ OBJDIR = ../priv/obj/$(TARGET)
+ 
+ # ----------------------------------------------------
+@@ -62,13 +64,15 @@ EVLOG_OBJECTS = \
+ ENTRY_OBJ=$(ERL_TOP)/erts/obj/$(TARGET)/port_entry.o
+ PORT_ENTRY_POINT=erl_port_entry
+ ENTRY_LDFLAGS=-entry:$(PORT_ENTRY_POINT)
++SOLIBS=
+ else
+ PROGRAMS = \
+-	memsup @os_mon_programs@
++	@os_mon_programs@
+ C_FILES= $(PROGRAMS:%=%.c)
++SOLIBS=memsup disksup
+ endif
+ 
+-TARGET_FILES= $(PROGRAMS:%=$(BINDIR)/%)
++TARGET_FILES= $(PROGRAMS:%=$(BINDIR)/%) $(SOLIBS:%=$(LIBDIR)/%.so)
+ 
+ LDFLAGS = @LDFLAGS@
+ 
+@@ -78,7 +82,7 @@ ALL_CFLAGS = @CFLAGS@ @DEFS@ $(CFLAGS)
+ # Targets
+ # ----------------------------------------------------
+ 
+-_create_dirs := $(shell mkdir -p $(OBJDIR) $(BINDIR))
++_create_dirs := $(shell mkdir -p $(OBJDIR) $(LIBDIR) $(BINDIR))
+ 
+ debug opt: $(TARGET_FILES)
+ 
+@@ -105,12 +109,21 @@ $(BINDIR)/ferrule: $(OBJDIR)/ferrule.o
+ $(BINDIR)/mod_syslog: $(OBJDIR)/mod_syslog.o
+ 	$(V_LD) $(LDFLAGS) -o $@ $<
+ 
+-$(BINDIR)/memsup: $(OBJDIR)/memsup.o
+-	$(V_LD) $(LDFLAGS) -o $@ $<
++$(LIBDIR)/memsup.so: $(OBJDIR)/memsup.o
++	$(DED_LD) $(DED_LDFLAGS) -o $@ $<
++
++$(LIBDIR)/disksup.so: $(OBJDIR)/disksup.o
++	$(DED_LD) $(DED_LDFLAGS) -o $@ $<
+ 
+ $(BINDIR)/cpu_sup: $(OBJDIR)/cpu_sup.o
+ 	$(V_LD) $(LDFLAGS) -o $@ $< $(CPU_SUP_LIBS)
+ 
++$(OBJDIR)/memsup.o: memsup.c
++	$(DED_CC) -c -o $@ $(DED_CFLAGS) $(DED_INCLUDES) $<
++
++$(OBJDIR)/disksup.o: disksup.c
++	$(DED_CC) -c -o $@ $(DED_CFLAGS) $(DED_INCLUDES) $<
++
+ $(OBJDIR)/%.o: %.c
+ 	$(V_CC) -c -o $@ $(ALL_CFLAGS) $<
+ 
+@@ -128,6 +141,8 @@ release_spec: opt
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/src"
+ 	$(INSTALL_DATA) $(C_FILES) "$(RELSYSDIR)/src"
+ 	$(INSTALL_DIR) "$(RELSYSDIR)/priv/bin"
+-	$(INSTALL_PROGRAM) $(TARGET_FILES) "$(RELSYSDIR)/priv/bin"
++	$(INSTALL_PROGRAM) $(PROGRAMS:%=$(BINDIR)/%) "$(RELSYSDIR)/priv/bin"
++	$(INSTALL_DIR) "$(RELSYSDIR)/priv/lib"
++	$(INSTALL_PROGRAM) $(SOLIBS:%=$(LIBDIR)/%.so) "$(RELSYSDIR)/priv/lib"
+ 
+ release_docs_spec:
+diff -up otp_src_17.3/lib/os_mon/c_src/memsup.c.orig otp_src_17.3/lib/os_mon/c_src/memsup.c
+--- otp_src_17.3/lib/os_mon/c_src/memsup.c.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/c_src/memsup.c	2015-05-06 14:34:04.098241954 +0800
+@@ -1,591 +1,176 @@
+-/*
+- * %CopyrightBegin%
+- * 
+- * Copyright Ericsson AB 1996-2013. All Rights Reserved.
+- * 
+- * The contents of this file are subject to the Erlang Public License,
+- * Version 1.1, (the "License"); you may not use this file except in
+- * compliance with the License. You should have received a copy of the
+- * Erlang Public License along with this software. If not, it can be
+- * retrieved online at http://www.erlang.org/.
+- * 
+- * Software distributed under the License is distributed on an "AS IS"
+- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
+- * the License for the specific language governing rights and limitations
+- * under the License.
+- * 
+- * %CopyrightEnd%
+- */
+-
+-/*
+- *  Purpose:  Portprogram for supervision of memory usage.
+- *
+- *  Synopsis: memsup
+- *
+- *  PURPOSE OF THIS PROGRAM
+- *
+- *  This program supervises the memory status of the entire system, and
+- *  sends status reports upon request from the Erlang system
+- *
+- *  SPAWNING FROM ERLANG
+- *
+- *  This program is started from Erlang as follows,
+- *
+- *      Port = open_port({spawn, 'memsup'}, [{packet,1}]) for UNIX
+- *
+- *  Erlang sends one of the request condes defined in memsup.h and this program
+- *  answers in one of two ways:
+- *  * If the request is for simple memory data (which is used periodically
+- *    for monitoring) the answer is simply sent in two packets.
+- *  * If the request is for the system specific data, the answer is delivered
+- *    in two packets per value, first a tag value, then the actual
+- *    value. The values are delivered "as is", this interface is
+- *    mainly for VxWorks.
+- *  All numbers are sent as strings of hexadecimal digits.
+- *
+- *  SUNOS FAKING
+- *
+- *  When using SunOS 4, the memory report is faked. The total physical memory
+- *  is always reported to be 256MB, and the used fraction to be 128MB.
+- *  
+- *  If capabilities, such as sysconf or procfs, is not defined on the system 
+- *  memsup will fake memory usage as well.
+- *  
+- *  Following ordering is defined for extended memory,
+- *  Linux:	procfs -> sysinfo -> sysconf -> fake
+- *  Sunos:	sysconf -> fake
+- *  other:	arch specific
+- *  
+- *  Todo:
+- *  Memory retrieval should be defined by capabilities and not by archs.
+- *  Ordering should be defined arch.
+- *  
+- *  STANDARD INPUT, OUTPUT AND ERROR
+- *
+- *  This program communicates with Erlang through the standard
+- *  input and output file descriptors (0 and 1). These descriptors
+- *  (and the standard error descriptor 2) must NOT be closed
+- *  explicitely by this program at termination (in UNIX it is
+- *  taken care of by the operating system itself; in VxWorks
+- *  it is taken care of by the spawn driver part of the Emulator).
+- *
+- *  END OF FILE
+- *
+- *  If a read from a file descriptor returns zero (0), it means
+- *  that there is no process at the other end of the connection
+- *  having the connection open for writing (end-of-file).
+- *
+- */
+-
+-#if defined(sgi) || defined(__sgi) || defined(__sgi__)
+-#include <sys/types.h>
+-#include <sys/sysmp.h>
+-#endif
+-
+-#include <stdio.h>
+-#include <stddef.h>
+-#include <stdlib.h>
+-
+-#include <unistd.h>
+-
+-#if (defined(__unix__) || defined(unix)) && !defined(USG)
+-#include <sys/param.h>
+-#endif
+-
+-#include <stdarg.h>
+-
+-#include <string.h>
+-#include <time.h>
+-#include <errno.h>
+-
+-#ifdef BSD4_4
+-#include <sys/types.h>
+-#include <sys/sysctl.h>
+-#if !defined (__OpenBSD__) && !defined (__NetBSD__) 
+-#include <vm/vm_param.h>
+-#endif
+-#if defined (__FreeBSD__) || defined(__DragonFly__) || defined (__NetBSD__)
+-#include <sys/vmmeter.h>
+-#endif
+-#endif
+-
+-#if defined (__linux__)
+ #include <sys/sysinfo.h>
+-#endif
+-
+-/* commands */
++#include <erl_driver.h>
+ #include "memsup.h"
+ 
+-#define CMD_SIZE      1
+-#define MAX_CMD_BUF   10
+-#define ERLIN_FD      0
+-#define ERLOUT_FD     1
+-
+-
+-/* procfs */
+-#if defined(__linux__) 
+-#include <fcntl.h>
+-#define MEMINFO "/proc/meminfo"
+-#endif
+-
+-/*  prototypes */
+-
+-static void print_error(const char *,...);
+-
+-#define MAIN main
+-
+-/*
+- * example, we want procfs information, now give them something equivalent: 
+- * 
+- * MemTotal:      4029352 kB	old 	HighTotal + LowTotal
+- * MemFree:       1674168 kB	old	HighFree + LowFree
+- * MemShared:           0 kB    old 	now always zero; not calculated
+- * Buffers:        417164 kB	old	temporary storage for raw disk blocks
+- * Cached:         371312 kB	old	in-memory cache for files read from the disk (the page cache)
+-
+- * Active:        1408492 kB	new
+-
+- * Inact_dirty:      7772 kB    new
+- * Inact_clean:      2008 kB    new
+- * Inact_target:        0 kB    new
+- * Inact_laundry:       0 kB    new, and might be missing too
+-
+- * HighTotal:           0 kB
+- * HighFree:            0 kB		memory area for userspace programs or for the pagecache
+- * LowTotal:      4029352 kB		
+- * LowFree:       1674168 kB		Highmem + kernel stuff, slab allocates here
+-
+- * SwapTotal:     4194296 kB	old	total amount of swap space available
+- * SwapFree:      4194092 kB	old	Memory which has been evicted from RAM
+- * Inactive:       549224 kB	2.5.41+
+- * Dirty:             872 kB	2.5.41+	Memory which is waiting to get written back to the disk
+- * Writeback:           0 kB	2.5.41+	Memory which is actively being written back to the disk
+- * AnonPages:      787616 kB	??
+- * Mapped:         113612 kB	2.5.41+	files which have been mmaped, such as libraries
+- * Slab:           342864 kB	2.5.41+	in-kernel data structures cache
+- * CommitLimit:   6208972 kB	??
+- * Committed_AS:  1141444 kB	2.5.41+
+- * PageTables:       9368 kB	2.5.41+
+- * VmallocTotal: 34359738367 kB	??	total size of vmalloc memory area
+- * VmallocUsed:     57376 kB	??	amount of vmalloc area which is used
+- * VmallocChunk: 34359677947 kB	??	largest contigious block of vmalloc area which is free
+- * ReverseMaps:      5738       2.5.41+	number of rmap pte chains
+- * SwapCached:          0 kB	2.5.??+	
+- * HugePages_Total:     0	2.5.??+
+- * HugePages_Free:      0	2.5.??+
+- * HugePages_Rsvd:      0	2.5.??+
+- * Hugepagesize:     2048 kB	2.5.??
+- *
+- * This information should be generalized for generic platform i.e. erlang.
+- */
+-
+-
+-
+-#define F_MEM_TOTAL   (1 << 0)
+-#define F_MEM_FREE    (1 << 1)
+-#define F_MEM_BUFFERS (1 << 2)
+-#define F_MEM_CACHED  (1 << 3)
+-#define F_MEM_SHARED  (1 << 4)
+-#define F_SWAP_TOTAL  (1 << 5)
+-#define F_SWAP_FREE   (1 << 6)
+-
+-typedef struct {
+-    unsigned int flag;
+-    unsigned long pagesize;
+-    unsigned long total;
+-    unsigned long free;
+-    unsigned long buffered;
+-    unsigned long cached;
+-    unsigned long shared;
+-    unsigned long total_swap;
+-    unsigned long free_swap;
+-} memory_ext;
+-
+-typedef struct mem_table_struct {
+-  const char *name;     /* memory type name */
+-  unsigned long *slot; /* slot in return struct */
+-} mem_table_struct;
+-
+-
+-/*  static variables */
+-
+-static char *program_name;
+-
+-static void
+-send(unsigned long value, unsigned long pagesize) {
+-    char buf[32];
+-    int left, bytes, res;
+-    int hex_zeroes;
+ 
+-    for (hex_zeroes = 0; (pagesize % 16) == 0; pagesize /= 16) {
+-	hex_zeroes++;
+-    }
+-    
+-    sprintf(buf+1, "%lx", value*pagesize);
+-    bytes = strlen(buf+1);
+-    while (hex_zeroes-- > 0) {
+-	bytes++;
+-	buf[bytes] = '0';
+-    }
+-    buf[0] = (char) bytes;
+-    left = ++bytes;
++struct driver_data {
++  ErlDrvPort port;
++  ErlDrvTermData port_term;
++};
+ 
+-    while (left > 0) {
+-	res = write(ERLOUT_FD, buf+bytes-left, left);
+-	if (res <= 0){
+-	    perror("Error writing to pipe");
+-	    exit(1);
+-	}
+-	left -= res;
+-    }
+-}
+ 
+-static void
+-send_tag(int value){
+-    unsigned char buf[2];
+-    int res,left;
+-
+-    buf[0] = 1U;
+-    buf[1] = (unsigned char) value;
+-    left = 2;
+-    while(left > 0) {
+-	if((res = write(ERLOUT_FD, buf+left-2,left)) <= 0){
+-	    perror("Error writing to pipe");
+-	    exit(1);
+-	} else {
+-	    left -= res;
+-	}
+-    }
+-}
++struct async_data {
++  int type;
++  unsigned long mem_total;
++  unsigned long mem_free;
++  unsigned long mem_buffers;
++  unsigned long mem_shared;
++  unsigned long swap_total;
++  unsigned long swap_free;
++};
+ 
+-#ifdef BSD4_4
+-static int
+-get_vmtotal(struct vmtotal *vt) {
+-	static int vmtotal_mib[] = {CTL_VM, VM_METER};
+-	size_t size = sizeof *vt;
+ 
+-	return sysctl(vmtotal_mib, 2, vt, &size, NULL, 0) != -1;
++static ErlDrvData memsup_start(ErlDrvPort port, char *buff __attribute__((unused))) {
++  struct driver_data *driver_data = (struct driver_data *)driver_alloc(sizeof(struct driver_data));
++  driver_data->port = port;
++  driver_data->port_term = driver_mk_port(port);
++  return (ErlDrvData)driver_data;
+ }
+-#endif
+-
+-#if defined(__linux__)
+-
+-
+-static int 
+-get_mem_procfs(memory_ext *me){
+-    int fd, nread;
+-    char buffer[4097];
+-    char *bp;
+-    unsigned long value;
+-    
+-    me->flag = 0;
+-    
+-    if ( (fd = open(MEMINFO, O_RDONLY)) < 0) return -1;
+ 
+-    if ( (nread = read(fd, buffer, 4096)) < 0) {
+-        close(fd);
+-	return -1;
+-    }
+-    close(fd);
+-
+-    buffer[nread] = '\0';
+-    
+-    /* Total and free is NEEDED! */
+-    
+-    bp = strstr(buffer, "MemTotal:");    
+-    if (bp != NULL && sscanf(bp, "MemTotal: %lu kB\n", &(me->total)))  me->flag |= F_MEM_TOTAL;
+-
+-    bp = strstr(buffer, "MemFree:");    
+-    if (bp != NULL && sscanf(bp, "MemFree: %lu kB\n", &(me->free)))    me->flag |= F_MEM_FREE;
+-    
+-    /* Extensions */
+-    
+-    bp = strstr(buffer, "Buffers:");    
+-    if (bp != NULL && sscanf(bp, "Buffers: %lu kB\n", &(me->buffered))) me->flag |= F_MEM_BUFFERS;
+-    
+-    bp = strstr(buffer, "Cached:");    
+-    if (bp != NULL && sscanf(bp, "Cached: %lu kB\n", &(me->cached)))   me->flag |= F_MEM_CACHED;
+-    
+ 
+-    /* Swap */
+-    
+-    bp = strstr(buffer, "SwapTotal:");    
+-    if (bp != NULL && sscanf(bp, "SwapTotal: %lu kB\n", &(me->total_swap))) me->flag |= F_SWAP_TOTAL;
+-    
+-    bp = strstr(buffer, "SwapFree:");    
+-    if (bp != NULL && sscanf(bp, "SwapFree: %lu kB\n", &(me->free_swap))) me->flag |= F_SWAP_FREE;
+-    
+-    me->pagesize = 1024; /* procfs defines its size in kB */
+-    
+-    return 1;   
++static void memsup_stop(ErlDrvData handle) {
++  driver_free((struct driver_data *)handle);
+ }
+-#endif
+-
+ 
+-/* arch specific functions */
+ 
+-#if defined(__linux__) && !defined(__ANDROID__)/* ifdef SYSINFO */
+-/* sysinfo does not include cached memory which is a problem. */
+-static int
+-get_extended_mem_sysinfo(memory_ext *me) {
+-    struct sysinfo info;
+-    me->flag = 0;
+-    if (sysinfo(&info) < 0) return -1;
+-    me->pagesize   = 1; 
+-    me->total      = info.totalram;
+-    me->free       = info.freeram;
+-    me->buffered   = info.bufferram;
+-    me->shared     = info.sharedram;
+-    me->total_swap = info.totalswap;
+-    me->free_swap  = info.freeswap;
+-    
+-    me->flag = F_MEM_TOTAL | F_MEM_FREE | F_MEM_SHARED | F_MEM_BUFFERS | F_SWAP_TOTAL | F_SWAP_FREE;
+-
+-    return 1;
+-}
+-#endif
+-
+-
+-#if defined(_SC_AVPHYS_PAGES)
+-static int
+-get_extended_mem_sysconf(memory_ext *me) {
+-    me->total      = sysconf(_SC_PHYS_PAGES);
+-    me->free       = sysconf(_SC_AVPHYS_PAGES);
+-    me->pagesize   = sysconf(_SC_PAGESIZE);
+-
+-    me->flag = F_MEM_TOTAL | F_MEM_FREE;
+-
+-    return 1;
++static void memsup_async(void *data) {
++  struct async_data *async_data = (struct async_data *)data;
++  struct sysinfo info = {0};
++  sysinfo(&info);
++  async_data->mem_total   = info.totalram;
++  async_data->mem_free    = info.freeram;
++  async_data->mem_buffers = info.bufferram;
++  async_data->mem_shared  = info.sharedram;
++  async_data->swap_total  = info.totalswap;
++  async_data->swap_free   = info.freeswap;
+ }
+-#endif
+ 
+-#if defined(BSD4_4)
+-static int
+-get_extended_mem_bsd4(memory_ext *me) {
+-    struct vmtotal vt;
+-    long pgsz;
+-
+-    if (!get_vmtotal(&vt)) return 0;
+-    if ((pgsz = sysconf(_SC_PAGESIZE)) == -1) return 0;
+-
+-    me->total      = (vt.t_free + vt.t_rm);
+-    me->free       = vt.t_free;
+-    me->pagesize   = pgsz;
+-    
+-    me->flag = F_MEM_TOTAL | F_MEM_FREE;
+-    
+-    return 1;
+-}
+-#endif
+ 
+-#if defined(sgi) || defined(__sgi) || defined(__sgi__)
+-static int
+-get_extended_mem_sgi(memory_ext *me) {
+-    struct rminfo rmi;
+-    if (sysmp(MP_SAGET, MPSA_RMINFO, &rmi, sizeof(rmi)) < 0)  return -1;
+-
+-    me->total    = (unsigned long)(rmi.physmem);
+-    me->free     = (unsigned long)(rmi.freemem);
+-    me->pagesize = (unsigned long)getpagesize(); 
+-    me->flag = F_MEM_TOTAL | F_MEM_FREE;
+-    
+-    return 1;
+-}
+-#endif
++static void memsup_output(ErlDrvData handle, char *buff, ErlDrvSizeT bufflen) {
++  struct driver_data *driver_data = (struct driver_data *)handle;
++  struct async_data *async_data;
+ 
+-static void
+-get_extended_mem(memory_ext *me) {
+-/* android */
+-#if defined(__ANDROID__)
+-    if (get_mem_procfs(me))  return;   
+-
+-/* linux */
+-#elif defined(__linux__)
+-    if (get_mem_procfs(me))  return;
+-    if (get_extended_mem_sysinfo(me)) return;
+-
+-/* bsd */
+-#elif defined(BSD4_4)
+-    if (get_extended_mem_bsd4(me))    return;
+-
+-/* sgi */
+-#elif defined(sgi) || defined(__sgi) || defined(__sgi__)
+-    if (get_extended_mem_sgi(me))     return;
+-#endif
+-
+-/* Does this exist on others than Solaris2? */
+-#if defined(_SC_AVPHYS_PAGES)
+-    if (get_extended_mem_sysconf(me)) return;
+-
+-/* We fake the rest */
+-/* SunOS4 (for example) */
+-#else  
+-    me->free     = (1<<27);	       	/* Fake! 128 MB used */
+-    me->total    = (1<<28);		/* Fake! 256 MB total */
+-    me->pagesize = 1;
+-    me->flag = F_MEM_TOTAL | F_MEM_FREE;
+-#endif
+-}
+-    
+-
+-static void 
+-get_basic_mem(unsigned long *tot, unsigned long *used, unsigned long *pagesize){
+-#if defined(_SC_AVPHYS_PAGES)	/* Does this exist on others than Solaris2? */
+-    unsigned long avPhys, phys, pgSz;
+-    
+-    phys = sysconf(_SC_PHYS_PAGES);
+-    avPhys = sysconf(_SC_AVPHYS_PAGES);
+-    *used = (phys - avPhys);
+-    *tot = phys;
+-    *pagesize = sysconf(_SC_PAGESIZE);
+-#elif defined(__linux__) && !defined(_SC_AVPHYS_PAGES)
+-    memory_ext me;
+-    if (get_mem_procfs(&me) < 0) {
+-        print_error("ProcFS read error");
+-        exit(1);
+-    }
+-    *tot      = me.total;
+-    *pagesize = me.pagesize;
+-    *used     = me.total - me.free;
+-#elif defined(BSD4_4)
+-    struct vmtotal vt;
+-    long pgsz;
+-
+-    if (!get_vmtotal(&vt)) goto fail;
+-    if ((pgsz = sysconf(_SC_PAGESIZE)) == -1) goto fail;
+-    *tot = (vt.t_free + vt.t_rm);
+-    *used = vt.t_rm;
+-    *pagesize = pgsz;
++  if (bufflen == 0)
+     return;
+-fail:
+-    print_error("%s", strerror(errno));
+-    exit(1);
+-#elif defined(sgi) || defined(__sgi) || defined(__sgi__)
+-    struct rminfo rmi;
+-    if (sysmp(MP_SAGET, MPSA_RMINFO, &rmi, sizeof(rmi)) != -1) {
+-	*tot = (unsigned long)(rmi.physmem);
+-	*used = (unsigned long)(rmi.physmem - rmi.freemem);
+-	*pagesize = (unsigned long)getpagesize(); 
+-    } else {
+-	print_error("%s", strerror(errno));
+-	exit(1); 
+-    }
+-#else  /* SunOS4 */
+-    *used = (1<<27);	       	/* Fake! 128 MB used */
+-    *tot = (1<<28);		/* Fake! 256 MB total */
+-    *pagesize = 1;
+-#endif
+-}    
+-
+-static void
+-simple_show_mem(void){
+-    unsigned long tot, used, pagesize;
+-    get_basic_mem(&tot, &used, &pagesize);
+-    send(used, pagesize);
+-    send(tot, pagesize);
+-}
+ 
+-static void 
+-extended_show_mem(void){
+-    memory_ext me;
+-    unsigned long ps;
+-    
+-    get_extended_mem(&me);
+-    ps = me.pagesize;
+-   
+-    if (me.flag & F_MEM_TOTAL)  { send_tag(MEM_TOTAL);        send(me.total, ps);      }
+-    if (me.flag & F_MEM_FREE)   { send_tag(MEM_FREE);         send(me.free, ps);       }
+-
+-    /* extensions */
+-    if (me.flag & F_MEM_BUFFERS){ send_tag(MEM_BUFFERS);      send(me.buffered, ps);   }
+-    if (me.flag & F_MEM_CACHED) { send_tag(MEM_CACHED);       send(me.cached, ps);     }
+-    if (me.flag & F_MEM_SHARED) { send_tag(MEM_SHARED);       send(me.shared, ps);     }
+-    
+-    /* swap */
+-    if (me.flag & F_SWAP_TOTAL) { send_tag(SWAP_TOTAL);       send(me.total_swap, ps); }
+-    if (me.flag & F_SWAP_FREE)  { send_tag(SWAP_FREE);        send(me.free_swap, ps);  }
+-    
+-    /* total is system total*/
+-    if (me.flag & F_MEM_TOTAL)  { send_tag(MEM_SYSTEM_TOTAL); send(me.total, ps);     }
+-    send_tag(SHOW_SYSTEM_MEM_END);
+-}    
+-
+-static void
+-message_loop(int erlin_fd)
+-{
+-    char cmdLen, cmd;
+-    int res;
+-    
+-    while (1){
+-	/*
+-	 *  Wait for command from Erlang
+-	 */
+-	if ((res = read(erlin_fd, &cmdLen, 1)) < 0) {
+-	    print_error("Error reading from Erlang");
+-	    return;
+-	}
+-
+-	if (res == 1) {		/* Exactly one byte read ? */
+-	    if (cmdLen == 1){	/* Should be! */
+-		switch (read(erlin_fd, &cmd, 1)){
+-		case 1:	  
+-		    switch (cmd){
+-		    case SHOW_MEM:
+-			simple_show_mem();
+-			break;
+-		    case SHOW_SYSTEM_MEM:
+-			extended_show_mem();
+-			break;
+-		    default:	/* ignore all other messages */
+-			break;
+-		    }
+-		  break;
+-		  
+-		case 0:
+-		  print_error("Erlang has closed");
+-		  return;
+-
+-		default:
+-		  print_error("Error reading from Erlang");
+-		  return;
+-		} /* switch() */
+-	    } else { /* cmdLen != 1 */
+-		print_error("Invalid command length (%d) received", cmdLen);
+-		return;
+-	    }
+-	} else {		/* Erlang end closed */
+-	    print_error("Erlang has closed");
+-	    return;
+-	}
+-    }
+-}
+-
+-/*
+- *  main
+- */
+-int
+-MAIN(int argc, char **argv)
+-{
+-  program_name = argv[0];
+-  message_loop(ERLIN_FD);
+-  return 0;
+-}
++  async_data = (struct async_data *)driver_alloc(sizeof(struct async_data));
++  async_data->type = buff[0];
++  driver_async(driver_data->port, NULL, memsup_async, async_data, NULL);
++}
++
++
++static void memsup_ready_async(ErlDrvData handle, ErlDrvThreadData thread_data) {
++  struct driver_data *driver_data = (struct driver_data *)handle;
++  struct async_data *async_data = (struct async_data *)thread_data;
++  int i;
++
++  switch(async_data->type) {
++  case SHOW_MEM: {
++    ErlDrvTermData term[][6] = {
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_total - async_data->mem_free,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_total,
++       ERL_DRV_TUPLE, 2}
++    };
++    
++    for(i=0;i<2;i++) {
++      erl_drv_output_term(driver_data->port_term, term[i], 6);
++    }
++    break;
++  }
++  case SHOW_SYSTEM_MEM: {
++    ErlDrvTermData term[][6] = {
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, MEM_TOTAL,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_total,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, MEM_FREE,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_free,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, MEM_BUFFERS,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_buffers,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, MEM_SHARED,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_shared,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, SWAP_TOTAL,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->swap_total,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, SWAP_FREE,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->swap_free,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, MEM_SYSTEM_TOTAL,
++       ERL_DRV_TUPLE, 2},
++      {ERL_DRV_PORT, driver_data->port_term,
++       ERL_DRV_UINT, async_data->mem_total,
++       ERL_DRV_TUPLE, 2},
++    };
++
++    ErlDrvTermData end_term[] = {
++      ERL_DRV_PORT, driver_data->port_term,
++      ERL_DRV_UINT, SHOW_SYSTEM_MEM_END,
++      ERL_DRV_TUPLE, 2};
++
++    for(i=0;i<14;i++) {
++      erl_drv_output_term(driver_data->port_term, term[i], 6);
++    }
++
++    erl_drv_output_term(driver_data->port_term, end_term, 6);
++    break;
++  }
++  default:
++    break;
++  }
++}
++
++
++ErlDrvEntry memsup_entry = {
++  .init            = NULL,
++  .start           = memsup_start,
++  .stop            = memsup_stop,
++  .output          = memsup_output,
++  .ready_input     = NULL,
++  .ready_output    = NULL,
++  .driver_name     = "memsup",
++  .finish          = NULL,
++  .handle          = NULL,
++  .control         = NULL,
++  .timeout         = NULL,
++  .outputv         = NULL,
++  .ready_async     = memsup_ready_async,
++  .flush           = NULL,
++  .call            = NULL,
++  .event           = NULL,
++  .extended_marker = ERL_DRV_EXTENDED_MARKER,
++  .major_version   = ERL_DRV_EXTENDED_MAJOR_VERSION,
++  .minor_version   = ERL_DRV_EXTENDED_MINOR_VERSION,
++  .driver_flags    = 0,
++  .handle2         = NULL,
++  .process_exit    = NULL,
++  .stop_select     = NULL,
++};
+ 
+ 
+-/*
+- *  print_error
+- *
+- */
+-static void
+-print_error(const char *format,...)
+-{
+-  va_list args;
+-  char buffer[256];
+-
+-  va_start(args, format);
+-  vsnprintf(buffer, 256, format, args);
+-  va_end(args);
+-  /* try to use one write only */
+-  fprintf(stderr, "[os_mon] memory supervisor port (memsup): %s\r\n", buffer);
+-  fflush(stderr);
++DRIVER_INIT(memsup) {
++  return &memsup_entry;
+ }
+diff -up otp_src_17.3/lib/os_mon/src/disksup.erl.orig otp_src_17.3/lib/os_mon/src/disksup.erl
+--- otp_src_17.3/lib/os_mon/src/disksup.erl.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/src/disksup.erl	2015-05-06 14:34:04.099241905 +0800
+@@ -92,7 +92,7 @@ param_default(disksup_posix_only) -> fal
+ %% gen_server callbacks
+ %%----------------------------------------------------------------------
+ 
+-init([]) ->  
++init([]) ->
+     process_flag(trap_exit, true),
+     process_flag(priority, low),
+ 
+@@ -226,139 +226,26 @@ get_os(PosixOnly) ->
+ 
+ %%--Port handling functions---------------------------------------------
+ 
+-start_portprogram() -> 
+-    open_port({spawn, "sh -s disksup 2>&1"}, [stream]).
+-
+-my_cmd(Cmd0, Port) ->
+-    %% Insert a new line after the command, in case the command
+-    %% contains a comment character
+-    Cmd = io_lib:format("(~s\n) </dev/null; echo  \"\^M\"\n", [Cmd0]),
+-    Port ! {self(), {command, [Cmd, 10]}},
+-    get_reply(Port, []).
+-
+-get_reply(Port, O) ->
+-    receive 
+-        {Port, {data, N}} -> 
+-            case newline(N, O) of
+-                {ok, Str} -> Str;
+-                {more, Acc} -> get_reply(Port, Acc)
+-            end;
+-        {'EXIT', Port, Reason} ->
+-	    exit({port_died, Reason})
+-    end.
+-
+-newline([13|_], B) -> {ok, lists:reverse(B)};
+-newline([H|T], B) -> newline(T, [H|B]);
+-newline([], B) -> {more, B}.
++start_portprogram() ->
++    os_mon:open_port(disksup, []).
+ 
+ %%--Check disk space----------------------------------------------------
+ 
+-check_disk_space({win32,_}, not_used, Threshold) ->
+-    Result = os_mon_sysinfo:get_disk_info(),
+-    check_disks_win32(Result, Threshold);
+-check_disk_space({unix, solaris}, Port, Threshold) ->
+-    Result = my_cmd("/usr/bin/df -lk", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, irix}, Port, Threshold) ->
+-    Result = my_cmd("/usr/sbin/df -lk",Port),
+-    check_disks_irix(skip_to_eol(Result), Threshold);
+ check_disk_space({unix, linux}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -lk", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, posix}, Port, Threshold) ->
+-    Result = my_cmd("df -k -P", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, dragonfly}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -k -t ufs,hammer", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, freebsd}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -k -l", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, openbsd}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -k -l", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, netbsd}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -k -t ffs", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, sunos4}, Port, Threshold) ->
+-    Result = my_cmd("df", Port),
+-    check_disks_solaris(skip_to_eol(Result), Threshold);
+-check_disk_space({unix, darwin}, Port, Threshold) ->
+-    Result = my_cmd("/bin/df -i -k -t ufs,hfs", Port),
+-    check_disks_susv3(skip_to_eol(Result), Threshold).
+-
+-% This code works for Linux and FreeBSD as well
+-check_disks_solaris("", _Threshold) ->
+-    [];
+-check_disks_solaris("\n", _Threshold) ->
+-    [];
+-check_disks_solaris(Str, Threshold) ->
+-    case io_lib:fread("~s~d~d~d~d%~s", Str) of
+-	{ok, [_FS, KB, _Used, _Avail, Cap, MntOn], RestStr} ->
+-	    if
+-		Cap >= Threshold ->
+-		    set_alarm({disk_almost_full, MntOn}, []);
+-		true ->
+-		    clear_alarm({disk_almost_full, MntOn})
+-	    end,
+-	    [{MntOn, KB, Cap} |
+-	     check_disks_solaris(RestStr, Threshold)];
+-	_Other ->
+-	    check_disks_solaris(skip_to_eol(Str),Threshold)
+-    end.
+-
+-% Parse per SUSv3 specification, notably recent OS X
+-check_disks_susv3("", _Threshold) ->
+-    [];
+-check_disks_susv3("\n", _Threshold) ->
+-    [];
+-check_disks_susv3(Str, Threshold) ->
+-    case io_lib:fread("~s~d~d~d~d%~d~d~d%~s", Str) of
+-    {ok, [_FS, KB, _Used, _Avail, Cap, _IUsed, _IFree, _ICap, MntOn], RestStr} ->
+-	    if
+-		Cap >= Threshold ->
+-		    set_alarm({disk_almost_full, MntOn}, []);
+-		true ->
+-		    clear_alarm({disk_almost_full, MntOn})
+-	    end,
+-	    [{MntOn, KB, Cap} |
+-	     check_disks_susv3(RestStr, Threshold)];
+-	_Other ->
+-	    check_disks_susv3(skip_to_eol(Str),Threshold)
+-    end.
+-
+-%% Irix: like Linux with an extra FS type column and no '%'.
+-check_disks_irix("", _Threshold) -> [];
+-check_disks_irix("\n", _Threshold) -> [];
+-check_disks_irix(Str, Threshold) ->
+-    case io_lib:fread("~s~s~d~d~d~d~s", Str) of
+-	{ok, [_FS, _FSType, KB, _Used, _Avail, Cap, MntOn], RestStr} ->
+-	    if Cap >= Threshold -> set_alarm({disk_almost_full, MntOn}, []);
+-	       true             -> clear_alarm({disk_almost_full, MntOn}) end,
+-	    [{MntOn, KB, Cap} | check_disks_irix(RestStr, Threshold)];
+-	_Other ->
+-	    check_disks_irix(skip_to_eol(Str),Threshold)
++    Port ! {self(), {command, <<>>}},
++    receive
++        {Port, Msg} ->
++            [check_disk(Info, Threshold) || Info <- Msg ],
++            Msg;
++        {'EXIT', Port, Reason} ->
++	    exit({port_died, Reason})
+     end.
+ 
+-check_disks_win32([], _Threshold) ->
+-    [];
+-check_disks_win32([H|T], Threshold) ->
+-    case io_lib:fread("~s~s~d~d~d", H) of
+-	{ok, [Drive,"DRIVE_FIXED",BAvail,BTot,_TotFree], _RestStr} ->
+-	    Cap = trunc((BTot-BAvail) / BTot * 100),
+-	    if
+-		 Cap >= Threshold ->
+-		    set_alarm({disk_almost_full, Drive}, []);
+-		true ->
+-		    clear_alarm({disk_almost_full, Drive})
+-	    end,
+-	    [{Drive, BTot div 1024, Cap} |
+-	     check_disks_win32(T, Threshold)]; % Return Total Capacity in Kbytes
+-	{ok,_,_RestStr} ->
+-	    check_disks_win32(T,Threshold);
+-	_Other ->
+-	    []
+-    end.
++check_disk({MntOn, _KB, Cap}, Threshold)
++  when Cap >= Threshold ->
++    set_alarm({disk_almost_full, MntOn}, []);
++check_disk({MntOn, _KB, _Cap}, _Threshold) ->
++    clear_alarm({disk_almost_full, MntOn}).
+ 
+ %%--Alarm handling------------------------------------------------------
+ 
+@@ -393,10 +280,3 @@ clear_alarms() ->
+ %% Type conversion
+ minutes_to_ms(Minutes) ->
+     trunc(60000*Minutes).
+-
+-skip_to_eol([]) ->
+-    [];
+-skip_to_eol([$\n | T]) ->
+-    T;
+-skip_to_eol([_ | T]) ->
+-    skip_to_eol(T).
+diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src/memsup.erl
+--- otp_src_17.3/lib/os_mon/src/memsup.erl.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/src/memsup.erl	2015-05-06 14:34:04.099241905 +0800
+@@ -799,7 +799,7 @@ port_init() ->
+     port_idle(Port).
+ 
+ start_portprogram() ->
+-    os_mon:open_port("memsup",[{packet,1}]).
++    os_mon:open_port("memsup",[]).
+ 
+ %% The connected process loops are a bit awkward (several different
+ %% functions doing almost the same thing) as
+@@ -835,10 +835,9 @@ port_idle(Port) ->
+ 
+ get_memory_usage(Port, Alloc, Memsup) ->
+     receive
+-	{Port, {data, Data}} when Alloc==undefined ->
+-	    get_memory_usage(Port, erlang:list_to_integer(Data, 16), Memsup);
+-	{Port, {data, Data}} ->
+-	    Total = erlang:list_to_integer(Data, 16),
++	{Port, Data} when Alloc==undefined ->
++	    get_memory_usage(Port, Data, Memsup);
++	{Port, Total} ->
+ 	    Memsup ! {collected_sys, {Alloc, Total}},
+ 	    port_idle(Port);
+ 	cancel ->
+@@ -852,9 +851,9 @@ get_memory_usage(Port, Alloc, Memsup) ->
+     end.
+ get_memory_usage_cancelled(Port, Alloc) ->
+     receive
+-	{Port, {data, _Data}} when Alloc==undefined ->
++	{Port, _Data} when Alloc==undefined ->
+ 	    get_memory_usage_cancelled(Port, 0);
+-	{Port, {data, _Data}} ->
++	{Port, _Data} ->
+ 	    port_idle(Port);
+ 	close ->
+ 	    port_close(Port);
+@@ -878,10 +877,10 @@ get_ext_memory_usage(Port, Accum, Memsup
+ 	    {?SWAP_FREE,	  free_swap}
+ 	],
+     receive
+-	{Port, {data, [?SHOW_SYSTEM_MEM_END]}} ->
++	{Port, ?SHOW_SYSTEM_MEM_END} ->
+ 	    Memsup ! {collected_ext_sys, Accum},
+ 	    port_idle(Port);
+-	{Port, {data, [Tag]}} ->
++	{Port, Tag} ->
+ 	    case lists:keysearch(Tag, 1, Tab) of
+ 		{value, {Tag, ATag}} ->
+ 		    get_ext_memory_usage(ATag, Port, Accum, Memsup);
+@@ -911,9 +910,9 @@ get_ext_memory_usage_cancelled(Port) ->
+ 	    {?SWAP_FREE,	  free_swap}
+ 	],
+     receive
+-	{Port, {data, [?SHOW_SYSTEM_MEM_END]}} ->
++	{Port, ?SHOW_SYSTEM_MEM_END} ->
+ 	    port_idle(Port);
+-	{Port, {data, [Tag]}} ->
++	{Port, Tag} ->
+ 	    case lists:keysearch(Tag, 1, Tab) of
+ 		{value, {Tag, ATag}} ->
+ 		    get_ext_memory_usage_cancelled(ATag, Port);
+@@ -930,8 +929,8 @@ get_ext_memory_usage_cancelled(Port) ->
+ 
+ get_ext_memory_usage(ATag, Port, Accum0, Memsup) ->
+     receive
+-	{Port, {data, Data}} ->
+-	    Accum = [{ATag,erlang:list_to_integer(Data, 16)}|Accum0],
++	{Port, Data} ->
++	    Accum = [{ATag,Data}|Accum0],
+ 	    get_ext_memory_usage(Port, Accum, Memsup);
+ 	cancel ->
+ 	    get_ext_memory_usage_cancelled(ATag, Port);
+@@ -944,7 +943,7 @@ get_ext_memory_usage(ATag, Port, Accum0,
+     end.
+ get_ext_memory_usage_cancelled(_ATag, Port) ->
+     receive
+-	{Port, {data, _Data}} ->
++	{Port, _Data} ->
+ 	    get_ext_memory_usage_cancelled(Port);
+ 	close ->
+ 	    port_close(Port);
+diff -up otp_src_17.3/lib/os_mon/src/os_mon.app.src.orig otp_src_17.3/lib/os_mon/src/os_mon.app.src
+--- otp_src_17.3/lib/os_mon/src/os_mon.app.src.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/src/os_mon.app.src	2015-05-06 14:34:04.100241855 +0800
+@@ -25,7 +25,7 @@
+     {registered, [os_mon_sup, os_mon_sysinfo, disksup, memsup, cpu_sup, 
+                   os_sup_server]},
+     {applications, [kernel, stdlib, sasl]},
+-    {env, [{start_cpu_sup, true},
++    {env, [{start_cpu_sup, false},
+ 	   {start_disksup, true},
+ 	   {start_memsup, true},
+ 	   {start_os_sup, false}]},
+diff -up otp_src_17.3/lib/os_mon/src/os_mon.erl.orig otp_src_17.3/lib/os_mon/src/os_mon.erl
+--- otp_src_17.3/lib/os_mon/src/os_mon.erl.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/lib/os_mon/src/os_mon.erl	2015-05-06 14:34:04.100241855 +0800
+@@ -81,18 +81,16 @@ get_env(Service, Param) ->
+ 
+ open_port(Name, Opts) ->
+     PrivDir = code:priv_dir(os_mon),
+-    ReleasedPath = filename:join([PrivDir,"bin",Name]),
+-    %% Check os_mon*/priv/bin/Name
+-    case filelib:is_regular(ReleasedPath) of
+-	true ->
+-	    erlang:open_port({spawn, "\""++ReleasedPath++"\""}, Opts);
+-	false ->
+-	    %% Use os_mon*/priv/bin/Arch/Name
+-	    ArchPath =
+-		filename:join(
+-		  [PrivDir,"bin",erlang:system_info(system_architecture),Name]),
+-	    erlang:open_port({spawn, "\""++ArchPath++"\""}, Opts)
+-    end.
++    ReleasedPath = filename:join([PrivDir,"lib",[Name,".so"]]),
++    Path =
++        case filelib:is_regular(ReleasedPath) of
++            true ->
++                filename:join([PrivDir,"lib"]);
++            false ->
++                filename:join([PrivDir,"lib",erlang:system_info(system_architecture)])
++        end,
++    ok = erl_ddll:load_driver(Path, Name),
++    erlang:open_port({spawn_driver, Name}, Opts).
+ 
+ 
+ %%%-----------------------------------------------------------------
