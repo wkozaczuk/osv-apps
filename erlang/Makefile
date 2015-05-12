@@ -13,6 +13,7 @@ otp_src_$(OTP_VERSION): otp_src_$(OTP_VERSION).tar.gz
 	tar xvf "$<"
 	touch otp_src_$(OTP_VERSION)/lib/os_mon/c_src/disksup.c
 	patch -b -p0 < os_mon.patch
+	patch -b -p0 < epmd.patch
 
 configure: otp_src_$(OTP_VERSION)
 	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) CFLAGS=-fpie LDFLAGS=-pie; ./configure -prefix=/usr --libdir=/usr/lib64 --disable-hipe --without-hipe --without-odbc --enable-builtin-zlib --without-termcap --without-wx --without-erl_interface --without-javac --without-jinterface

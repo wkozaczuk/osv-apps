@@ -1,0 +1,176 @@
+diff -up otp_src_17.3/erts/epmd/src/Makefile.in.orig otp_src_17.3/erts/epmd/src/Makefile.in
+--- otp_src_17.3/erts/epmd/src/Makefile.in.orig	2015-05-12 08:55:13.512064200 +0800
++++ otp_src_17.3/erts/epmd/src/Makefile.in	2015-05-12 08:56:02.924734358 +0800
+@@ -87,7 +87,7 @@ else
+ LIBS    = @LIBS@ @SYSTEMD_DAEMON_LIBS@ $(ERTS_INTERNAL_LIBS)
+ endif
+ LDFLAGS = @LDFLAGS@
+-
++DEXPORT = @DEXPORT@
+ 
+ 
+ # ----------------------------------------------------
+@@ -151,7 +151,7 @@ $(BINDIR)/$(EPMD): $(EPMD_OBJS) $(ERTS_L
+ 	$(call build-ose-load-module, $@, $(EPMD_OBJS) $(OSE_LM_OBJS), $(LIBS), $(EPMD_LMCONF))
+ else
+ $(BINDIR)/$(EPMD): $(EPMD_OBJS) $(ERTS_LIB)
+-	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) -o $@ $(EPMD_OBJS) $(LIBS)
++	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) $(DEXPORT) -o $@ $(EPMD_OBJS) $(LIBS)
+ endif
+ 
+ $(OBJDIR)/%.o: %.c epmd.h epmd_int.h
+diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/common/erlexec.c
+--- otp_src_17.3/erts/etc/common/erlexec.c.orig	2015-05-11 19:47:37.053496386 +0800
++++ otp_src_17.3/erts/etc/common/erlexec.c	2015-05-12 14:12:05.198659854 +0800
+@@ -30,6 +30,8 @@
+ #include "erl_driver.h"
+ #include <stdlib.h>
+ #include <stdarg.h>
++#include <dlfcn.h>
++#include <pthread.h>
+ #include "erl_misc_utils.h"
+ 
+ #ifdef __WIN32__
+@@ -393,6 +395,30 @@ add_extra_suffixes(char *prog, int type)
+    return res;
+ }
+ 
++static int
++osv_run(char *path, int argc, char **argv)
++{
++  int (*mainfun)(int, char **) = NULL;
++  int result;
++
++  void *elf_handle = dlopen(path, RTLD_LAZY);
++
++  if (!elf_handle)
++    goto err;
++
++  mainfun = (int (*)(int, char **)) dlsym(elf_handle, "main");
++  result = (mainfun)?mainfun(argc, argv):1;
++  dlclose(elf_handle);
++
++  if(!mainfun)
++    goto err;
++
++  return result;
++ err:
++  error("Error %d executing \'%s\'.", errno, path);
++  return 1;
++}
++
+ #ifdef __WIN32__
+ __declspec(dllexport) int win_erlexec(int argc, char **argv, HANDLE module, int windowed)
+ #else
+@@ -1079,52 +1105,7 @@ int main(int argc, char **argv)
+ #else
+ 
+  skip_arg_massage:
+-    if (start_detached) {
+-	int status = fork();
+-	if (status != 0)	/* Parent */
+-	    return 0;
+-
+-	if (reset_cerl_detached)
+-	    putenv("CERL_DETACHED_PROG=");
+-
+-	/* Detach from controlling terminal */
+-#ifdef HAVE_SETSID
+-	setsid();
+-#elif defined(TIOCNOTTY)
+-	{
+-	  int fd = open("/dev/tty", O_RDWR);
+-	  if (fd >= 0) {
+-	    ioctl(fd, TIOCNOTTY, NULL);
+-	    close(fd);
+-	  }
+-	}
+-#endif
+-
+-	status = fork();
+-	if (status != 0)	/* Parent */
+-	    return 0;
+-
+-	/*
+-	 * Grandchild.
+-	 */
+-	close(0);
+-	open("/dev/null", O_RDONLY);
+-	close(1);
+-	open("/dev/null", O_WRONLY);
+-	close(2);
+-	open("/dev/null", O_WRONLY);
+-#ifdef DEBUG
+-	execvp(emu, Eargsp); /* "xterm ..." needs to search the path */
+-#endif
+-    } 
+-#ifdef DEBUG
+-    else
+-#endif
+-    {
+-	execv(emu, Eargsp);
+-    }
+-    error("Error %d executing \'%s\'.", errno, emu);
+-    return 1;
++    return osv_run(emu, EargsCnt, Eargsp);
+ #endif
+ }
+ 
+@@ -1186,6 +1167,24 @@ usage_format(char *format, ...)
+     usage_aux();
+ }
+ 
++static void*
++osv_sh(void *arg)
++{
++  char *command = (char *)arg;
++  char *argv[] = {command, NULL};
++  osv_run(command, 1, argv);
++  return NULL;
++}
++
++static int
++osv_system(char *command)
++{
++  pthread_t thread;
++  if (!command)
++    return 1;
++  return pthread_create(&thread, NULL, osv_sh, command);
++}
++
+ void
+ start_epmd(char *epmd)
+ {
+@@ -1201,7 +1200,7 @@ start_epmd(char *epmd)
+ 	erts_snprintf(epmd_cmd, sizeof(epmd_cmd), "%s" DIRSEP "epmd", bindir);
+ 	arg1 = "-daemon";
+ #else
+-	erts_snprintf(epmd_cmd, sizeof(epmd_cmd), "\"%s" DIRSEP "epmd\" -daemon", bindir);
++	erts_snprintf(epmd_cmd, sizeof(epmd_cmd), "%s" DIRSEP "epmd", bindir);
+ #endif
+     } 
+ #ifdef __WIN32__
+@@ -1225,9 +1224,9 @@ start_epmd(char *epmd)
+ 	    result = 0;
+     }
+ #else
+-    result = system(epmd);
++    result = osv_system(epmd);
+ #endif
+-    if (result == -1) {
++    if (result != 0) {
+       fprintf(stderr, "Error spawning %s (error %d)\n", epmd_cmd,errno);
+       exit(1);
+     }
+diff -up otp_src_17.3/erts/etc/common/Makefile.in.orig otp_src_17.3/erts/etc/common/Makefile.in
+--- otp_src_17.3/erts/etc/common/Makefile.in.orig	2015-05-11 20:02:59.263209893 +0800
++++ otp_src_17.3/erts/etc/common/Makefile.in	2015-05-11 20:03:32.620571829 +0800
+@@ -447,7 +447,7 @@ $(OBJDIR)/safe_string.o: ../common/safe_
+ 
+ ifneq ($(TARGET),win32)
+ $(BINDIR)/$(ERLEXEC): $(OBJDIR)/$(ERLEXEC).o $(ERTS_LIB)
+-	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) -o $@ $(OBJDIR)/$(ERLEXEC).o $(ERTS_INTERNAL_LIBS)
++	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) -o $@ $(OBJDIR)/$(ERLEXEC).o $(ERTS_INTERNAL_LIBS) -ldl -pthread
+ 
+ $(OBJDIR)/$(ERLEXEC).o: $(ERLEXECDIR)/$(ERLEXEC).c $(RC_GENERATED)
+ 	$(V_CC) -I$(EMUDIR) $(CFLAGS) -o $@ -c $(ERLEXECDIR)/$(ERLEXEC).c
