@@ -25,7 +25,6 @@ compile: configure
 
 install: compile
 	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) DESTDIR=$(CURDIR)/ROOTFS; make install
-	find ROOTFS -name '*.so' | xargs -I {} ldd {} | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|dl|m|util|rt|pthread).so' | xargs -I {} install -D -T {} ROOTFS{}
 
 erlang.so: erlang.c
 	$(CC) -shared -rdynamic -fPIC -o erlang.so -std=gnu99 -DERTS_VERSION=$(ERTS_VERSION) erlang.c
