@@ -1,2 +1,2 @@
 base: cloudius/osv-base
-cmdline: --env=BINDIR=/usr/lib64/erlang/erts-6.2/bin /usr/lib64/erlang/erts-6.2/bin/beam.smp -K true -- -root /usr/lib64/erlang -progname erl -- -home / --
+cmdline: /usr/lib64/erlang.so -env HOME / /etc/erlang/vm.args /etc/default/erlang/vm.args

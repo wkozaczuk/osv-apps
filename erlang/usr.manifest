@@ -1,1 +1,3 @@
 /**: ${MODULE_DIR}/ROOTFS/**
+/usr/lib64/erlang.so: ${MODULE_DIR}/erlang.so
+/etc/**: ${MODULE_DIR}/etc/**
