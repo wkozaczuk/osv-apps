@@ -21,5 +21,5 @@ install: compile
 
 clean:
 	-rm -rf ROOTFS
-	-rm -rf elixir_$(ELIXIR_VERSION)
-	-rm -rf elixir_$(ELIXIR_VERSION).tar.gz elixir_$(ELIXIR_VERSION).tar.gz.temp
+	-rm -rf elixir-$(ELIXIR_VERSION)
+	-rm -rf elixir-$(ELIXIR_VERSION).tar.gz elixir-$(ELIXIR_VERSION).tar.gz.temp
