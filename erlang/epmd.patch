@@ -1,27 +1,6 @@
-diff -up otp_src_17.3/erts/epmd/src/Makefile.in.orig otp_src_17.3/erts/epmd/src/Makefile.in
---- otp_src_17.3/erts/epmd/src/Makefile.in.orig	2015-05-12 08:55:13.512064200 +0800
-+++ otp_src_17.3/erts/epmd/src/Makefile.in	2015-05-12 08:56:02.924734358 +0800
-@@ -87,7 +87,7 @@ else
- LIBS    = @LIBS@ @SYSTEMD_DAEMON_LIBS@ $(ERTS_INTERNAL_LIBS)
- endif
- LDFLAGS = @LDFLAGS@
--
-+DEXPORT = @DEXPORT@
- 
- 
- # ----------------------------------------------------
-@@ -151,7 +151,7 @@ $(BINDIR)/$(EPMD): $(EPMD_OBJS) $(ERTS_L
- 	$(call build-ose-load-module, $@, $(EPMD_OBJS) $(OSE_LM_OBJS), $(LIBS), $(EPMD_LMCONF))
- else
- $(BINDIR)/$(EPMD): $(EPMD_OBJS) $(ERTS_LIB)
--	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) -o $@ $(EPMD_OBJS) $(LIBS)
-+	$(ld_verbose)$(PURIFY) $(LD) $(LDFLAGS) $(DEXPORT) -o $@ $(EPMD_OBJS) $(LIBS)
- endif
- 
- $(OBJDIR)/%.o: %.c epmd.h epmd_int.h
 diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/common/erlexec.c
---- otp_src_17.3/erts/etc/common/erlexec.c.orig	2015-05-11 19:47:37.053496386 +0800
-+++ otp_src_17.3/erts/etc/common/erlexec.c	2015-05-12 14:12:05.198659854 +0800
+--- otp_src_17.3/erts/etc/common/erlexec.c.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/erts/etc/common/erlexec.c	2015-05-12 14:30:54.276803481 +0800
 @@ -30,6 +30,8 @@
  #include "erl_driver.h"
  #include <stdlib.h>
@@ -163,8 +142,8 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
        exit(1);
      }
 diff -up otp_src_17.3/erts/etc/common/Makefile.in.orig otp_src_17.3/erts/etc/common/Makefile.in
---- otp_src_17.3/erts/etc/common/Makefile.in.orig	2015-05-11 20:02:59.263209893 +0800
-+++ otp_src_17.3/erts/etc/common/Makefile.in	2015-05-11 20:03:32.620571829 +0800
+--- otp_src_17.3/erts/etc/common/Makefile.in.orig	2014-09-17 03:10:57.000000000 +0800
++++ otp_src_17.3/erts/etc/common/Makefile.in	2015-05-12 14:30:54.277803433 +0800
 @@ -447,7 +447,7 @@ $(OBJDIR)/safe_string.o: ../common/safe_
  
  ifneq ($(TARGET),win32)
