@@ -16,6 +16,7 @@
 int main(int argc, char **argv){
   setenv("ROOTDIR", ROOTDIR, false);
   setenv("BINDIR", BINDIR, false);
+  setenv("TERM", "vt100-qemu", false);
 
   while(--argc) {
     argv++;
