@@ -12,7 +12,7 @@ cd redis-$VERSION
 patch -p0 -N < ../../patch
 # TODO: The top-level make's "-r" option breaks redis's inner makefiles.
 # MAKEFLAGS should probably have been unset before calling us, not here.
-unset MAKEFLAGS
+unset MAKEFLAGS ARCH
 make CFLAGS="-fPIC" LDFLAGS="-shared" MALLOC=libc
 cp src/redis-server ../..
 cd ../..
