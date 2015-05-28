@@ -14,6 +14,7 @@ wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz
 tar zxvf ncurses-5.9.tar.gz
 cd ncurses-5.9
 patch -p2 < ../../ncurses.patch
+patch -p1 < ../../ncurses-5.9-gcc-5.patch
 # TODO: Without the "--disable-tcap-names", ncurses/tinfo/read_entry.c
 # fails to read the extended part (#if XNAMES). Try to think why. Is this
 # an OSv specific bug? But for now, rogue works fine if we just don't support
