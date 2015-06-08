@@ -3,7 +3,7 @@ module: version_check ruby.so usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
-RUBY_VER=2.2.0
+RUBY_VER=2.2.2
 
 RUBY_LDFLAGS=-lm -lcrypt -ldl -lpthread -lruby
 LIBS=-Lupstream/ruby
