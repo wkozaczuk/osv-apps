@@ -1,4 +1,4 @@
-VERSION := 0.2.3-Helium-SR3
+VERSION := 0.3.0-Lithium
 NAME	:= opendaylight
 DIR		:= distribution-karaf
 TARBALL := $(DIR)-$(VERSION).tar.gz

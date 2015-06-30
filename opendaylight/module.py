@@ -21,7 +21,7 @@ default = api.run_java(
         '-Dkaraf.startRemoteShell=true',
     ],
     classpath=[
-        '/opendaylight/lib/karaf.branding-1.0.3-Helium-SR3.jar',
+        '/opendaylight/lib/karaf.branding-1.1.0-Lithium.jar',
         '/opendaylight/lib/karaf-jaas-boot.jar',
         '/opendaylight/lib/karaf.jar',
         '/opendaylight/lib/karaf-jmx-boot.jar',
