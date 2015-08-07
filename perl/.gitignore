@@ -12,3 +12,4 @@ osvbuild.sh
 *.swp
 *.tar.bz2
 /toc.*
+/tmp
