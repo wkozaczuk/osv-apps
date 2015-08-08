@@ -34,3 +34,6 @@ clean:
 
 deepclean: clean
 	rm -f $(PERLSRC_DIST)
+
+# for scripts/build
+module: install
