@@ -1,5 +1,5 @@
 #!/bin/sh
-VERSION=1.7.16.1
+VERSION=9.0.0.0
 wget http://jruby.org.s3.amazonaws.com/downloads/$VERSION/jruby-complete-$VERSION.jar
 mv jruby-complete-$VERSION.jar jruby-complete.jar
 mkdir gemjar
