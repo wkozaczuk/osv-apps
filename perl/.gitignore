@@ -1,4 +1,4 @@
-ROOTFS
+ROOTFS*
 .vimlist
 perl
 experiments
@@ -13,3 +13,4 @@ osvbuild.sh
 *.tar.bz2
 /toc.*
 /tmp
+*.out

@@ -5,7 +5,10 @@ PERLSRC_DIST = perl_$(PERLSRC_VERS).orig.tar.bz2
 WGET_URL     = http://ftp.us.debian.org/debian/pool/main/p/perl/$(PERLSRC_DIST)
 
 OSV_FLAGS       := -std=gnu99 -fpie -rdynamic -pie
-PERL_LDFLAGS    := -ldl -lm -lc -lcrypt 
+
+EXTRALIBS       := /lib/x86_64-linux-gnu/libcrypt.so.1
+EXTRALIBS       += /lib/x86_64-linux-gnu/libnsl.so.1
+EXTRALIBS       += /lib/x86_64-linux-gnu/libutil.so.1
 
 CONFIGURE_FLAGS := -des -Duseshrplib -Ud_sigsetjmp -Dprefix=/osv -Dsiteprefix=/osv/opt -Dldflags="$(OSV_FLAGS)" -Dccflags=-fPIC
 INSTALL_FLAGS   := DESTDIR=../ROOTFS
@@ -13,10 +16,16 @@ INSTALL_FLAGS   := DESTDIR=../ROOTFS
 perl: perl/libperl.so
 
 #install.perl target only installs perl, not manuals
-install: perl
+install: perl extralibs
 	cd perl && make $(INSTALL_FLAGS) install.perl
 
-#ORIG:  cc -o perl -fstack-protector -L/usr/local/lib -Wl,-E -Wl,-rpath,/usr/local/lib/perl5/5.20.2/x86_64-linux/CORE perlmain.o  libperl.so `cat ext.libs` -lnsl -ldl -lm -lcrypt -lutil -lc 
+extralibs: $(EXTRALIBS)
+	mkdir -p ROOTFS/lib
+	cp -p $? ROOTFS/lib
+
+#ORIGINAL link step from debian:
+#PERL_LDFLAGS    := -lnsl -ldl -lm -lcrypt -lutil -lc
+#cc -o perl -fstack-protector -L/usr/local/lib -Wl,-E -Wl,-rpath,/usr/local/lib/perl5/5.20.2/x86_64-linux/CORE perlmain.o  libperl.so `cat ext.libs` $(PERL_LDFLAGS)
 
 perl/libperl.so: perl/makefile
 	cd perl && make
@@ -29,8 +38,11 @@ perl/makefile: $(PERLSRC_DIST)
 $(PERLSRC_DIST):
 	wget $(WGET_URL)
 
+#configure only (make clean configure):
+configure:  perl/makefile
+
 clean:
-	rm -rf perl usr.manifest ROOTFS
+	rm -rf perl ROOTFS
 
 deepclean: clean
 	rm -f $(PERLSRC_DIST)
