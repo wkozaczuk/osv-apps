@@ -6,10 +6,6 @@ WGET_URL     = http://ftp.us.debian.org/debian/pool/main/p/perl/$(PERLSRC_DIST)
 
 OSV_FLAGS       := -std=gnu99 -fpie -rdynamic -pie
 
-EXTRALIBS       := /lib/x86_64-linux-gnu/libcrypt.so.1
-EXTRALIBS       += /lib/x86_64-linux-gnu/libnsl.so.1
-EXTRALIBS       += /lib/x86_64-linux-gnu/libutil.so.1
-
 CONFIGURE_FLAGS := -des -Duseshrplib -Ud_sigsetjmp -Dprefix=/osv -Dsiteprefix=/osv/opt -Dldflags="$(OSV_FLAGS)" -Dccflags=-fPIC
 INSTALL_FLAGS   := DESTDIR=../ROOTFS
 
@@ -19,9 +15,16 @@ perl: perl/libperl.so
 install: perl extralibs
 	cd perl && make $(INSTALL_FLAGS) install.perl
 
-extralibs: $(EXTRALIBS)
+extralibs: perl/libperl.so
 	mkdir -p ROOTFS/lib
-	cp -p $? ROOTFS/lib
+	ldd perl/libperl.so | awk '/=> \// {print $$1, $$3}' | \
+		while read target source; \
+		do \
+		case $$target in \
+		libdl.*|libm.*|libc.*) ;; \
+		*) cp -v $$source ROOTFS/lib/$$target;; \
+		esac; \
+		done
 
 #ORIGINAL link step from debian:
 #PERL_LDFLAGS    := -lnsl -ldl -lm -lcrypt -lutil -lc
