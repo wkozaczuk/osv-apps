@@ -1,6 +1,6 @@
 from osv.modules import api
 
-api.require('cado')
+api.require('perl')
 
 default = api.run(
     '--cwd=/cado '
