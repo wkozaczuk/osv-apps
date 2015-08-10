@@ -5,13 +5,13 @@ CADO_VERS  != echo 1_107 | sed -e 's/_/./'
 CADOSRC_DIST  := cado_linux_$(_CADO_VERS).tgz
 WGET_URL      := http://iweb.dl.sourceforge.net/project/cado/v$(CADO_VERS)/$(CADOSRC_DIST)
 
-install: $(CADOSRC_DIST) ROOTFS/cado
+install: ROOTFS/cado
 
 $(CADOSRC_DIST):
-	#echo CADO_VERS=$(CADO_VERS) CADOSRC_DIST=$(CADOSRC_DIST)
+	@echo CADO_VERS=$(CADO_VERS) CADOSRC_DIST=$(CADOSRC_DIST)
 	wget $(WGET_URL)
 
-ROOTFS/cado:
+ROOTFS/cado: $(CADOSRC_DIST)
 	mkdir -p ROOTFS
 	tar xf $(CADOSRC_DIST)
 	mv cado_linux_$(_CADO_VERS) ROOTFS/cado
