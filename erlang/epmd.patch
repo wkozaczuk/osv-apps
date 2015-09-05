@@ -1,7 +1,7 @@
-diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/common/erlexec.c
---- otp_src_17.3/erts/etc/common/erlexec.c.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/erts/etc/common/erlexec.c	2015-05-12 14:30:54.276803481 +0800
-@@ -30,6 +30,8 @@
+diff -up erts/etc/common/erlexec.c.orig erts/etc/common/erlexec.c
+--- erts/etc/common/erlexec.c.orig	2015-06-24 02:56:21.000000000 +0800
++++ erts/etc/common/erlexec.c	2015-09-05 20:25:57.297943048 +0800
+@@ -31,6 +31,8 @@
  #include "erl_driver.h"
  #include <stdlib.h>
  #include <stdarg.h>
@@ -10,7 +10,7 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
  #include "erl_misc_utils.h"
  
  #ifdef __WIN32__
-@@ -393,6 +395,30 @@ add_extra_suffixes(char *prog, int type)
+@@ -398,6 +400,30 @@ add_extra_suffixes(char *prog, int type)
     return res;
  }
  
@@ -41,7 +41,7 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
  #ifdef __WIN32__
  __declspec(dllexport) int win_erlexec(int argc, char **argv, HANDLE module, int windowed)
  #else
-@@ -1079,52 +1105,7 @@ int main(int argc, char **argv)
+@@ -1098,52 +1124,7 @@ int main(int argc, char **argv)
  #else
  
   skip_arg_massage:
@@ -95,7 +95,7 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
  #endif
  }
  
-@@ -1186,6 +1167,24 @@ usage_format(char *format, ...)
+@@ -1205,6 +1186,24 @@ usage_format(char *format, ...)
      usage_aux();
  }
  
@@ -120,7 +120,7 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
  void
  start_epmd(char *epmd)
  {
-@@ -1201,7 +1200,7 @@ start_epmd(char *epmd)
+@@ -1220,7 +1219,7 @@ start_epmd(char *epmd)
  	erts_snprintf(epmd_cmd, sizeof(epmd_cmd), "%s" DIRSEP "epmd", bindir);
  	arg1 = "-daemon";
  #else
@@ -129,7 +129,7 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
  #endif
      } 
  #ifdef __WIN32__
-@@ -1225,9 +1224,9 @@ start_epmd(char *epmd)
+@@ -1244,9 +1243,9 @@ start_epmd(char *epmd)
  	    result = 0;
      }
  #else
@@ -141,10 +141,10 @@ diff -up otp_src_17.3/erts/etc/common/erlexec.c.orig otp_src_17.3/erts/etc/commo
        fprintf(stderr, "Error spawning %s (error %d)\n", epmd_cmd,errno);
        exit(1);
      }
-diff -up otp_src_17.3/erts/etc/common/Makefile.in.orig otp_src_17.3/erts/etc/common/Makefile.in
---- otp_src_17.3/erts/etc/common/Makefile.in.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/erts/etc/common/Makefile.in	2015-05-12 14:30:54.277803433 +0800
-@@ -447,7 +447,7 @@ $(OBJDIR)/safe_string.o: ../common/safe_
+diff -up erts/etc/common/Makefile.in.orig erts/etc/common/Makefile.in
+--- erts/etc/common/Makefile.in.orig	2015-06-24 02:56:21.000000000 +0800
++++ erts/etc/common/Makefile.in	2015-09-05 20:25:57.298942999 +0800
+@@ -448,7 +448,7 @@ $(OBJDIR)/safe_string.o: ../common/safe_
  
  ifneq ($(TARGET),win32)
  $(BINDIR)/$(ERLEXEC): $(OBJDIR)/$(ERLEXEC).o $(ERTS_LIB)
