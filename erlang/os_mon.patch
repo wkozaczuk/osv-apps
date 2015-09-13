@@ -1,6 +1,6 @@
-diff -up otp_src_17.3/lib/os_mon/c_src/disksup.c.orig otp_src_17.3/lib/os_mon/c_src/disksup.c
---- otp_src_17.3/lib/os_mon/c_src/disksup.c.orig	2015-05-06 14:42:48.469408682 +0800
-+++ otp_src_17.3/lib/os_mon/c_src/disksup.c	2015-05-06 14:51:21.278154184 +0800
+diff -up lib/os_mon/c_src/disksup.c.orig lib/os_mon/c_src/disksup.c
+--- lib/os_mon/c_src/disksup.c.orig	2015-09-05 20:15:44.594120104 +0800
++++ lib/os_mon/c_src/disksup.c	2015-09-05 20:15:44.668116457 +0800
 @@ -0,0 +1,154 @@
 +#include <string.h>
 +#include <sys/param.h>
@@ -156,10 +156,10 @@ diff -up otp_src_17.3/lib/os_mon/c_src/disksup.c.orig otp_src_17.3/lib/os_mon/c_
 +DRIVER_INIT(disksup) {
 +  return &disksup_entry;
 +}
-diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/c_src/Makefile.in
---- otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/c_src/Makefile.in	2015-05-06 14:34:04.096242053 +0800
-@@ -18,6 +18,7 @@
+diff -up lib/os_mon/c_src/Makefile.in.orig lib/os_mon/c_src/Makefile.in
+--- lib/os_mon/c_src/Makefile.in.orig	2015-06-24 02:56:21.000000000 +0800
++++ lib/os_mon/c_src/Makefile.in	2015-09-05 20:15:44.710114388 +0800
+@@ -19,6 +19,7 @@
  #
  include $(ERL_TOP)/make/target.mk
  include $(ERL_TOP)/make/$(TARGET)/otp.mk
@@ -167,7 +167,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
  
  CC = @CC@
  LD = @LD@
-@@ -25,6 +26,7 @@ LIBS = @LIBS@
+@@ -26,6 +27,7 @@ LIBS = @LIBS@
  CPU_SUP_LIBS = @CPU_SUP_LIBS@
  
  BINDIR = ../priv/bin/$(TARGET)
@@ -175,7 +175,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
  OBJDIR = ../priv/obj/$(TARGET)
  
  # ----------------------------------------------------
-@@ -62,13 +64,15 @@ EVLOG_OBJECTS = \
+@@ -63,13 +65,15 @@ EVLOG_OBJECTS = \
  ENTRY_OBJ=$(ERL_TOP)/erts/obj/$(TARGET)/port_entry.o
  PORT_ENTRY_POINT=erl_port_entry
  ENTRY_LDFLAGS=-entry:$(PORT_ENTRY_POINT)
@@ -193,7 +193,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
  
  LDFLAGS = @LDFLAGS@
  
-@@ -78,7 +82,7 @@ ALL_CFLAGS = @CFLAGS@ @DEFS@ $(CFLAGS)
+@@ -79,7 +83,7 @@ ALL_CFLAGS = @CFLAGS@ @DEFS@ $(CFLAGS)
  # Targets
  # ----------------------------------------------------
  
@@ -202,7 +202,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
  
  debug opt: $(TARGET_FILES)
  
-@@ -105,12 +109,21 @@ $(BINDIR)/ferrule: $(OBJDIR)/ferrule.o
+@@ -106,12 +110,21 @@ $(BINDIR)/ferrule: $(OBJDIR)/ferrule.o
  $(BINDIR)/mod_syslog: $(OBJDIR)/mod_syslog.o
  	$(V_LD) $(LDFLAGS) -o $@ $<
  
@@ -226,7 +226,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
  $(OBJDIR)/%.o: %.c
  	$(V_CC) -c -o $@ $(ALL_CFLAGS) $<
  
-@@ -128,6 +141,8 @@ release_spec: opt
+@@ -129,6 +142,8 @@ release_spec: opt
  	$(INSTALL_DIR) "$(RELSYSDIR)/src"
  	$(INSTALL_DATA) $(C_FILES) "$(RELSYSDIR)/src"
  	$(INSTALL_DIR) "$(RELSYSDIR)/priv/bin"
@@ -236,25 +236,26 @@ diff -up otp_src_17.3/lib/os_mon/c_src/Makefile.in.orig otp_src_17.3/lib/os_mon/
 +	$(INSTALL_PROGRAM) $(SOLIBS:%=$(LIBDIR)/%.so) "$(RELSYSDIR)/priv/lib"
  
  release_docs_spec:
-diff -up otp_src_17.3/lib/os_mon/c_src/memsup.c.orig otp_src_17.3/lib/os_mon/c_src/memsup.c
---- otp_src_17.3/lib/os_mon/c_src/memsup.c.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/c_src/memsup.c	2015-05-06 14:34:04.098241954 +0800
-@@ -1,591 +1,176 @@
+diff -up lib/os_mon/c_src/memsup.c.orig lib/os_mon/c_src/memsup.c
+--- lib/os_mon/c_src/memsup.c.orig	2015-09-05 20:15:44.712114290 +0800
++++ lib/os_mon/c_src/memsup.c	2015-09-05 20:21:55.288862544 +0800
+@@ -1,592 +1,176 @@
 -/*
 - * %CopyrightBegin%
 - * 
 - * Copyright Ericsson AB 1996-2013. All Rights Reserved.
 - * 
-- * The contents of this file are subject to the Erlang Public License,
-- * Version 1.1, (the "License"); you may not use this file except in
-- * compliance with the License. You should have received a copy of the
-- * Erlang Public License along with this software. If not, it can be
-- * retrieved online at http://www.erlang.org/.
-- * 
-- * Software distributed under the License is distributed on an "AS IS"
-- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
-- * the License for the specific language governing rights and limitations
-- * under the License.
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *     http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
 - * 
 - * %CopyrightEnd%
 - */
@@ -346,7 +347,7 @@ diff -up otp_src_17.3/lib/os_mon/c_src/memsup.c.orig otp_src_17.3/lib/os_mon/c_s
 -#if !defined (__OpenBSD__) && !defined (__NetBSD__) 
 -#include <vm/vm_param.h>
 -#endif
--#if defined (__FreeBSD__) || defined(__DragonFly__) || defined (__NetBSD__)
+-#if defined (__FreeBSD__) || defined(__DragonFly__) || defined (__NetBSD__) || defined(__OpenBSD__)
 -#include <sys/vmmeter.h>
 -#endif
 -#endif
@@ -984,10 +985,10 @@ diff -up otp_src_17.3/lib/os_mon/c_src/memsup.c.orig otp_src_17.3/lib/os_mon/c_s
 +DRIVER_INIT(memsup) {
 +  return &memsup_entry;
  }
-diff -up otp_src_17.3/lib/os_mon/src/disksup.erl.orig otp_src_17.3/lib/os_mon/src/disksup.erl
---- otp_src_17.3/lib/os_mon/src/disksup.erl.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/src/disksup.erl	2015-05-06 14:34:04.099241905 +0800
-@@ -92,7 +92,7 @@ param_default(disksup_posix_only) -> fal
+diff -up lib/os_mon/src/disksup.erl.orig lib/os_mon/src/disksup.erl
+--- lib/os_mon/src/disksup.erl.orig	2015-06-24 02:56:21.000000000 +0800
++++ lib/os_mon/src/disksup.erl	2015-09-05 20:15:44.991100550 +0800
+@@ -93,7 +93,7 @@ param_default(disksup_posix_only) -> fal
  %% gen_server callbacks
  %%----------------------------------------------------------------------
  
@@ -996,7 +997,7 @@ diff -up otp_src_17.3/lib/os_mon/src/disksup.erl.orig otp_src_17.3/lib/os_mon/sr
      process_flag(trap_exit, true),
      process_flag(priority, low),
  
-@@ -226,139 +226,26 @@ get_os(PosixOnly) ->
+@@ -227,139 +227,26 @@ get_os(PosixOnly) ->
  
  %%--Port handling functions---------------------------------------------
  
@@ -1150,7 +1151,7 @@ diff -up otp_src_17.3/lib/os_mon/src/disksup.erl.orig otp_src_17.3/lib/os_mon/sr
  
  %%--Alarm handling------------------------------------------------------
  
-@@ -393,10 +280,3 @@ clear_alarms() ->
+@@ -394,10 +281,3 @@ clear_alarms() ->
  %% Type conversion
  minutes_to_ms(Minutes) ->
      trunc(60000*Minutes).
@@ -1161,10 +1162,10 @@ diff -up otp_src_17.3/lib/os_mon/src/disksup.erl.orig otp_src_17.3/lib/os_mon/sr
 -    T;
 -skip_to_eol([_ | T]) ->
 -    skip_to_eol(T).
-diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src/memsup.erl
---- otp_src_17.3/lib/os_mon/src/memsup.erl.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/src/memsup.erl	2015-05-06 14:34:04.099241905 +0800
-@@ -799,7 +799,7 @@ port_init() ->
+diff -up lib/os_mon/src/memsup.erl.orig lib/os_mon/src/memsup.erl
+--- lib/os_mon/src/memsup.erl.orig	2015-06-24 02:56:21.000000000 +0800
++++ lib/os_mon/src/memsup.erl	2015-09-05 20:15:44.993100451 +0800
+@@ -800,7 +800,7 @@ port_init() ->
      port_idle(Port).
  
  start_portprogram() ->
@@ -1173,7 +1174,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  
  %% The connected process loops are a bit awkward (several different
  %% functions doing almost the same thing) as
-@@ -835,10 +835,9 @@ port_idle(Port) ->
+@@ -836,10 +836,9 @@ port_idle(Port) ->
  
  get_memory_usage(Port, Alloc, Memsup) ->
      receive
@@ -1187,7 +1188,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    Memsup ! {collected_sys, {Alloc, Total}},
  	    port_idle(Port);
  	cancel ->
-@@ -852,9 +851,9 @@ get_memory_usage(Port, Alloc, Memsup) ->
+@@ -853,9 +852,9 @@ get_memory_usage(Port, Alloc, Memsup) ->
      end.
  get_memory_usage_cancelled(Port, Alloc) ->
      receive
@@ -1199,7 +1200,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    port_idle(Port);
  	close ->
  	    port_close(Port);
-@@ -878,10 +877,10 @@ get_ext_memory_usage(Port, Accum, Memsup
+@@ -879,10 +878,10 @@ get_ext_memory_usage(Port, Accum, Memsup
  	    {?SWAP_FREE,	  free_swap}
  	],
      receive
@@ -1212,7 +1213,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    case lists:keysearch(Tag, 1, Tab) of
  		{value, {Tag, ATag}} ->
  		    get_ext_memory_usage(ATag, Port, Accum, Memsup);
-@@ -911,9 +910,9 @@ get_ext_memory_usage_cancelled(Port) ->
+@@ -912,9 +911,9 @@ get_ext_memory_usage_cancelled(Port) ->
  	    {?SWAP_FREE,	  free_swap}
  	],
      receive
@@ -1224,7 +1225,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    case lists:keysearch(Tag, 1, Tab) of
  		{value, {Tag, ATag}} ->
  		    get_ext_memory_usage_cancelled(ATag, Port);
-@@ -930,8 +929,8 @@ get_ext_memory_usage_cancelled(Port) ->
+@@ -931,8 +930,8 @@ get_ext_memory_usage_cancelled(Port) ->
  
  get_ext_memory_usage(ATag, Port, Accum0, Memsup) ->
      receive
@@ -1235,7 +1236,7 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    get_ext_memory_usage(Port, Accum, Memsup);
  	cancel ->
  	    get_ext_memory_usage_cancelled(ATag, Port);
-@@ -944,7 +943,7 @@ get_ext_memory_usage(ATag, Port, Accum0,
+@@ -945,7 +944,7 @@ get_ext_memory_usage(ATag, Port, Accum0,
      end.
  get_ext_memory_usage_cancelled(_ATag, Port) ->
      receive
@@ -1244,10 +1245,10 @@ diff -up otp_src_17.3/lib/os_mon/src/memsup.erl.orig otp_src_17.3/lib/os_mon/src
  	    get_ext_memory_usage_cancelled(Port);
  	close ->
  	    port_close(Port);
-diff -up otp_src_17.3/lib/os_mon/src/os_mon.app.src.orig otp_src_17.3/lib/os_mon/src/os_mon.app.src
---- otp_src_17.3/lib/os_mon/src/os_mon.app.src.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/src/os_mon.app.src	2015-05-06 14:34:04.100241855 +0800
-@@ -25,7 +25,7 @@
+diff -up lib/os_mon/src/os_mon.app.src.orig lib/os_mon/src/os_mon.app.src
+--- lib/os_mon/src/os_mon.app.src.orig	2015-06-24 02:56:21.000000000 +0800
++++ lib/os_mon/src/os_mon.app.src	2015-09-05 20:15:44.993100451 +0800
+@@ -26,7 +26,7 @@
      {registered, [os_mon_sup, os_mon_sysinfo, disksup, memsup, cpu_sup, 
                    os_sup_server]},
      {applications, [kernel, stdlib, sasl]},
@@ -1256,10 +1257,10 @@ diff -up otp_src_17.3/lib/os_mon/src/os_mon.app.src.orig otp_src_17.3/lib/os_mon
  	   {start_disksup, true},
  	   {start_memsup, true},
  	   {start_os_sup, false}]},
-diff -up otp_src_17.3/lib/os_mon/src/os_mon.erl.orig otp_src_17.3/lib/os_mon/src/os_mon.erl
---- otp_src_17.3/lib/os_mon/src/os_mon.erl.orig	2014-09-17 03:10:57.000000000 +0800
-+++ otp_src_17.3/lib/os_mon/src/os_mon.erl	2015-05-06 14:34:04.100241855 +0800
-@@ -81,18 +81,16 @@ get_env(Service, Param) ->
+diff -up lib/os_mon/src/os_mon.erl.orig lib/os_mon/src/os_mon.erl
+--- lib/os_mon/src/os_mon.erl.orig	2015-06-24 02:56:21.000000000 +0800
++++ lib/os_mon/src/os_mon.erl	2015-09-05 20:15:44.994100402 +0800
+@@ -82,18 +82,16 @@ get_env(Service, Param) ->
  
  open_port(Name, Opts) ->
      PrivDir = code:priv_dir(os_mon),
