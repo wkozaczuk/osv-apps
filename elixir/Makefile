@@ -1,6 +1,6 @@
 .PHONY: all
 
-ELIXIR_VERSION=1.0.4
+ELIXIR_VERSION=1.0.5
 
 all: install
 module: install
