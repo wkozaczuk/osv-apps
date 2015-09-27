@@ -13,20 +13,13 @@ fi
 cd "node-$1"
 
 ed -s node.gyp << EOF
-,s/'executable'/'shared_library'/
+,s/\(['"]\)executable\1/\1shared_library\1/
 g/'-Wl,--whole-archive/d
 w
 EOF
 
 ed -s common.gypi << EOF
 ,s/'cflags':.*'-pthread'/&, '-fPIC'/
-w
-EOF
-
-ed -s deps/v8/src/api.cc << EOF
-/i::FlagList::SetFlagsFromCommandLine/i
-i::Isolate::EnsureDefaultIsolate();
-.
 w
 EOF
 
@@ -43,5 +36,10 @@ ed -s "$(find deps/uv -name uv-unix.h)" <<EOF
 #endif
 #if 1
 .
+w
+EOF
+
+[ -f deps/v8/src/types.h ] && ed -s deps/v8/src/types.h <<EOF
+,s/nearbyint/rint/
 w
 EOF
