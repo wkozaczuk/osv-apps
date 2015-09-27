@@ -1,9 +1,9 @@
 Support for building Node.js in OSV
 
-For example, to build Node 0.10.31:
+For example, to build Node 4.1.1:
 
-./GET 0.10.31
-make NODE_VERSION=0.10.31
+./GET 4.1.1
+make NODE_VERSION=4.1.1
 
 
 An example Capstanfile:

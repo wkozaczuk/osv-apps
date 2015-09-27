@@ -1,2 +1,2 @@
-libnode.so
+libnode-*.so
 node-*
