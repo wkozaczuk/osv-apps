@@ -1,3 +1,2 @@
 /usr/cassandra/lib/**: ${MODULE_DIR}/ROOTFS/usr/cassandra/lib/**
 /usr/cassandra/conf/**: ${MODULE_DIR}/ROOTFS/usr/cassandra/conf/**
-/usr/cassandra/lib/jna-3.2.7.jar: ${MODULE_DIR}/ROOTFS/usr/cassandra/lib/jna-3.2.7.jar
