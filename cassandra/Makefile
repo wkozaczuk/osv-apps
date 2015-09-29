@@ -3,7 +3,7 @@ current_name=apache-cassandra-$(VERSION)
 dir=upstream/$(current_name)
 tarball_name=apache-cassandra-$(VERSION)-bin.tar.gz
 tarball=upstream/$(tarball_name)
-jna_version=3.2.7
+jna_version=3.5.2
 jna=upstream/jna-$(jna_version).jar
 
 .PHONY: module
@@ -30,7 +30,7 @@ $(tarball): upstream
 	touch $@
 
 $(jna): upstream
-	cd upstream && wget -nc http://download.java.net/maven/2/net/java/dev/jna/jna/$(jna_version)/jna-$(jna_version).jar
+	cd upstream && wget -nc https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/$(jna_version)/jna-$(jna_version).jar
 	touch $@
 
 clean:
