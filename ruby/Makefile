@@ -77,9 +77,10 @@ ROOTFS: module
 	cp -a ./upstream/ruby/lib/* ./ROOTFS/usr/lib/ruby/2.2.0
 	cp ./upstream/ruby/rbconfig.rb ./ROOTFS/usr/lib/ruby/2.2.0/x86_64-linux/rbconfig.rb
 	cp -a ./upstream/ruby/.ext/x86_64-linux/* ./ROOTFS/usr/lib/ruby/2.2.0/x86_64-linux/
+	mkdir -p ./ROOTFS/usr/local/ssl
 	cp ./upstream/cert.pem ./ROOTFS/usr/local/ssl/cert.pem
 	find upstream/ruby/.ext/x86_64-linux/ -name '*.so' -exec ldd {} \;|awk '{print "cp",$$3,"./ROOTFS/"}'|grep "/lib"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|grep -v "libruby.so"|sort|uniq > tmp.sh
-	find upstream/ruby/ -name "libruby.so" -exec ldd {} \;|awk '{print $$1,":",$$3}' |grep "/lib"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libresolv.so.2"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|sort|uniq|sed -e "s/ //" >> tmp.sh
+	find upstream/ruby/ -name "libruby.so" -exec ldd {} \;|awk '{print "cp ",$$3,"./ROOTFS/"}' |grep "/lib"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libresolv.so.2"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|sort|uniq|sed -e "s/ //" >> tmp.sh
 	sh tmp.sh
 	rm tmp.sh
 
