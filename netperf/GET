@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.6.0
+VERSION=2.7.0
 
 mkdir upstream
 cd upstream
