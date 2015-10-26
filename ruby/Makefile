@@ -57,9 +57,9 @@ usr.manifest: ruby.so upstream/bundler upstream/cert.pem
 	echo '/ruby.so: $${MODULE_DIR}/ruby.so' > usr.manifest
 	echo '/**: $${MODULE_DIR}/upstream/ruby/bin/**' >> usr.manifest
 	echo '/libruby.so.2.2: $${MODULE_DIR}/upstream/ruby/libruby.so' >> usr.manifest
-	echo '/usr/lib/ruby/2.2.0/**: $${MODULE_DIR}/upstream/ruby/lib/**' >> usr.manifest
-	echo '/usr/lib/ruby/2.2.0/x86_64-linux/rbconfig.rb: $${MODULE_DIR}/upstream/ruby/rbconfig.rb' >> usr.manifest
-	echo '/usr/lib/ruby/2.2.0/x86_64-linux/**: $${MODULE_DIR}/upstream/ruby/.ext/x86_64-linux/**' >> usr.manifest
+	echo '/usr/share/ruby/**: $${MODULE_DIR}/upstream/ruby/lib/**' >> usr.manifest
+	echo '/usr/lib64/ruby/rbconfig.rb: $${MODULE_DIR}/upstream/ruby/rbconfig.rb' >> usr.manifest
+	echo '/usr/lib64/ruby/**: $${MODULE_DIR}/upstream/ruby/.ext/x86_64-linux/**' >> usr.manifest
 	echo '/usr/local/ssl/cert.pem: $${MODULE_DIR}/upstream/cert.pem' >> usr.manifest
 	find upstream/ruby/.ext/x86_64-linux/ -name '*.so' -exec ldd {} \;|awk '{print $$1,":",$$3}'|grep "/lib"|grep -v "ld-linux"|grep -v "libc.so"|grep -v "libresolv.so.2"|grep -v "libpthread.so"|grep -v "libdl.so"|grep -v "libm.so"|sort|uniq|sed -e "s/ //" \
 		>> usr.manifest
