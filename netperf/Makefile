@@ -1,9 +1,9 @@
 .PHONY: module
-module: upstream
+module: usr.manifest
 
-upstream:
+usr.manifest:
 	./GET
 
 .PHONY: clean
 clean:
-	rm -rf upstream
+	rm -rf upstream netperf.so netserver.so usr.manifest
