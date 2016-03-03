@@ -10,11 +10,11 @@
 jvm_dir=install/usr/lib/jvm
 
 java_version=$(shell ./latest.sh java-1.8.0-openjdk-headless x86_64)
-java_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/j/
+java_dir=http://mirrors.kernel.org/fedora/development/rawhide/Everything/x86_64/os/Packages/j/
 java_fullname=java-1.8.0-openjdk-headless-$(java_version).x86_64.rpm
 
 tzdata_version=$(shell ./latest.sh tzdata-java noarch)
-tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/x86_64/os/Packages/t/
+tzdata_dir=http://mirrors.kernel.org/fedora/development/rawhide/Everything/x86_64/os/Packages/t/
 tzdata_fullname=tzdata-java-$(tzdata_version).noarch.rpm
 
 SRC = $(shell readlink -f ../..)
