@@ -16,6 +16,8 @@ iperf: $(iperfv)/src/iperf
 
 $(iperfv)/src/iperf: $(tarball)
 	tar xzf $^
+	sed -i 's/[[:space:]]\+$$//' $(iperfv)/src/Server.cpp
+	sed -i 's/[[:space:]]\+$$//' $(iperfv)/src/Client.cpp
 	patch -p0 < so.patch
 	patch -p0 < zcopy-rx.diff
 	patch -p0 < zcopy-tx.diff
