@@ -1,2 +1,2 @@
-/usr/newrelic.jar:${MODULE_DIR}/newrelic.jar
-/usr/newrelic.yml:${MODULE_DIR}/newrelic.yml
+/usr/newrelic.jar: ${MODULE_DIR}/newrelic.jar
+/usr/newrelic.yml: ${MODULE_DIR}/newrelic.yml
