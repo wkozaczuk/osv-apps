@@ -5,4 +5,4 @@ install:
 
 .PHONY: clean
 clean:
-	rm -rf build install *.tar.gz
+	rm -rf build install *.tar.gz usr.manifest

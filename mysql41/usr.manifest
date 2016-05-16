@@ -1,3 +1,0 @@
-/etc/**: ${MODULE_DIR}/ROOTFS/etc/**
-/mysql41/**: ${MODULE_DIR}/ROOTFS/mysql41/**
-/usr/local/share/mysql/**: ${MODULE_DIR}/ROOTFS/usr/local/share/mysql/**
