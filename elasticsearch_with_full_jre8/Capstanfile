@@ -1,0 +1,24 @@
+base: cloudius/osv-openjdk8
+
+cmdline: >
+  --cwd=/elasticsearch
+  /java.so
+  -Xms256m 
+  -Xmx1g 
+  -Djava.awt.headless=true 
+  -XX:+UseParNewGC 
+  -XX:+UseConcMarkSweepGC 
+  -XX:CMSInitiatingOccupancyFraction=75 
+  -XX:+UseCMSInitiatingOccupancyOnly 
+  -XX:+HeapDumpOnOutOfMemoryError 
+  -XX:+DisableExplicitGC 
+  -Dfile.encoding=UTF-8 
+  -Djna.nosys=true 
+  -Des.insecure.allow.root=true
+  -Des.path.home=/elasticsearch 
+  -Des.foreground=true
+  -cp /elasticsearch/lib/elasticsearch-2.3.3.jar:/elasticsearch/lib/* 
+  org.elasticsearch.bootstrap.Elasticsearch 
+  start
+
+build: make
