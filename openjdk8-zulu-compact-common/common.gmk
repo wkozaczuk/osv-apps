@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2016 Waldemar Kozaczuk
+#
+# This work is open source software, licensed under the terms of the
+# BSD license as described in the LICENSE file in the top-level directory.
+#
+
+jvm_dir=install/usr/lib/jvm
+
+java8_compact_profile_builder_git_url=https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git
+
+java8_jdk_tarball_url = $(shell ./latest.sh)
+
+SRC = $(shell readlink -f ../..)
+
+COMPACT_PROFILE_IMAGE_DIR=j2re-compact$(PROFILE_NUMBER)-image
+
+module:
+	cd $(SRC)/java && mvn package -q -DskipTests=true
+	rm -rf upstream
+	mkdir -p upstream
+	cd upstream && git clone https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git
+	cd upstream/openjdk8_compact_profiles_builder && ./build_compact_profile.sh $(java8_jdk_tarball_url) $(PROFILE_NUMBER)
+	rm -rf install
+	mkdir -p install/usr/lib/jvm/$(COMPACT_PROFILE_IMAGE_DIR)
+	mv upstream/openjdk8_compact_profiles_builder/work/build/linux-x86_64-normal-server-release/images/$(COMPACT_PROFILE_IMAGE_DIR) $(jvm_dir)/$(COMPACT_PROFILE_IMAGE_DIR)/jre
+	ln -sf $(COMPACT_PROFILE_IMAGE_DIR) install/usr/lib/jvm/java
+	rm -rf $(jvm_dir)/java/jre/bin
+	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
+	rm -rf $(jvm_dir)/java/jre/lib/audio/*
+	cp $(SRC)/java/runjava/target/runjava.jar install/usr/lib/jvm/java/jre/lib/ext/
+	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/jre/lib/security/
+
+clean:
+	rm -rf upstream install
+	cd $(SRC)/java && mvn clean -q
+	-rm -f dependency-reduced-pom.xml
