@@ -1,7 +1,0 @@
-
-/etc/**: /home/nyh/osv/apps/mysql56/install/etc/**
-/usr/share/**: /home/nyh/osv/apps/mysql56/install/usr/share/**
-/usr/lib/**: /home/nyh/osv/apps/mysql56/install/usr/lib/**
-/usr/data/**: /home/nyh/osv/apps/mysql56/install/usr/data/**
-/usr/bin/mysqld: /home/nyh/osv/apps/mysql56/build/sql/mysqld
-
