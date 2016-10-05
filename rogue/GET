@@ -24,9 +24,12 @@ make
 cd ..
 
 # Get and compile Rogue
-wget http://rogue.rogueforge.net/files/rogue5.4/rogue5.4.4-src.tar.gz
-tar zxvf rogue5.4.4-src.tar.gz
-cd rogue5.4.4
+#wget http://rogue.rogueforge.net/files/rogue5.4/rogue5.4.4-src.tar.gz
+#tar zxvf rogue5.4.4-src.tar.gz
+#cd rogue5.4.4
+wget https://github.com/phs/rogue/archive/master.tar.gz
+tar zxvf master.tar.gz
+cd rogue-master
 CFLAGS="-fPIC -O2" ./configure --prefix=/usr 
 cat >> Makefile << END
 LDFLAGS=-pie
