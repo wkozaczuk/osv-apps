@@ -11,6 +11,8 @@ import os, os.path
 
 provides = ['java']
 
+non_isolated_jvm = True
+
 api.require('fonts')
 api.require('ca-certificates')
 api.require('libz')
