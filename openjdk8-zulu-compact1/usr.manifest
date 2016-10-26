@@ -18,3 +18,5 @@
 /usr/lib/&/jni/power.so: java/&
 /java.so: java/jvm/java_non_isolated.so
 /java/cloudius.jar: ${OSV_BASE}/java/cloudius/target/cloudius.jar
+/java/runjava.jar: ${OSV_BASE}/java/runjava/target/runjava.jar
+/.java.policy: ${OSV_BASE}/modules/java/.java.policy

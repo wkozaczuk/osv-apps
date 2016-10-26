@@ -31,7 +31,6 @@ module:
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
 	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id)
-	cp $(SRC)/java/runjava/target/runjava.jar install/usr/lib/jvm/java/jre/lib/ext/
 	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/jre/lib/security/
 
 clean:
