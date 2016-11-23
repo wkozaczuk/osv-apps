@@ -19,7 +19,6 @@ linked_jre_dir=usr/lib/jvm/$(jre_name)
 SRC = $(shell readlink -f ../..)
 
 module:
-	cd $(SRC)/java && mvn package -q -DskipTests=true
 	mkdir -p upstream
 	wget -c -O upstream/$(java_fullname) $(java_dir)$(java_fullname)
 	rm -rf install
@@ -34,5 +33,3 @@ module:
 
 clean:
 	rm -rf upstream install
-	cd $(SRC)/java && mvn clean -q
-	-rm -f dependency-reduced-pom.xml

@@ -6,13 +6,10 @@
 #
 
 from osv.modules.filemap import FileMap
-from osv.modules import api
-
-api.require('java-non-isolated')
 
 usr_files = FileMap()
-usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact1/install').to('/').allow_symlink()
-usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact1/install/usr/lib/jvm/java') \
+usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact3-with-java-beans/install').to('/').allow_symlink()
+usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact3-with-java-beans/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
 usr_files.link('/usr/lib/jvm/jre').to('/usr/lib/jvm/java/jre')
