@@ -1,5 +1,7 @@
 from osv.modules import api
 
+api.require('jre')
+
 _catalina_base = "/usr/tomcat"
 _catalina_home = _catalina_base
 _catalina_tmpdir = _catalina_base + "/temp"

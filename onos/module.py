@@ -1,6 +1,6 @@
 from osv.modules import api
 
-
+api.require('jre')
 default = api.run_java(
     args=['org.apache.karaf.main.Main'],
     classpath=[

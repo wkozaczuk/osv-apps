@@ -1,5 +1,9 @@
 from osv.modules.filemap import FileMap
+from osv.modules import api
 import os, os.path
+
+api.require('java')
+provides = ['jre']
 
 usr_files = FileMap()
 
