@@ -17,7 +17,7 @@ otp_src_$(OTP_VERSION): otp_src_$(OTP_VERSION).tar.gz
 	cd otp_src_$(OTP_VERSION); patch -b -p0 < ../epmd.patch
 
 configure: otp_src_$(OTP_VERSION)
-	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) CFLAGS=-fpie LDFLAGS="-pie -rdynamic"; ./configure -prefix=/usr --libdir=/usr/lib64 --disable-hipe --without-hipe --without-odbc --enable-builtin-zlib --with-termcap=ncurses --without-wx --without-erl_interface --without-javac --without-jinterface
+	cd otp_src_$(OTP_VERSION); export ERL_TOP=$(CURDIR)/otp_src_$(OTP_VERSION) CFLAGS=-fpie LDFLAGS="-pie -rdynamic"; ./configure -prefix=/usr --libdir=/usr/lib64 --disable-hipe --without-hipe --without-odbc --enable-builtin-zlib --with-termcap=ncurses --without-wx --without-erl_interface --without-javac --without-jinterface --with-ssl=$(CURDIR)/../../external/x64/misc.bin/usr
 
 compile: configure
 	mkdir -p ROOTFS
