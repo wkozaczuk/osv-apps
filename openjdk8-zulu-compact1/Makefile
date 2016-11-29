@@ -6,6 +6,7 @@
 #
 
 PROFILE_NUMBER=1
+COMPACT_PROFILE_IMAGE_DIR=j2re-compact$(PROFILE_NUMBER)-image
 include ../openjdk8-zulu-compact-common/common.gmk
 
 .PHONY: module clean
