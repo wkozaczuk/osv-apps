@@ -14,9 +14,8 @@ java8_jdk_tarball_url = $(shell ./latest.sh)
 SRC = $(shell readlink -f ../..)
 
 module:
-	rm -rf upstream
 	mkdir -p upstream
-	cd upstream && git clone https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git
+	cd upstream && (git -C openjdk8_compact_profiles_builder pull || git clone https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git openjdk8_compact_profiles_builder)
 	cd upstream/openjdk8_compact_profiles_builder && ./build_compact_profile.sh $(java8_jdk_tarball_url) $(PROFILE_NUMBER) $(ADD_JAVA_BEANS)
 	rm -rf install
 	mkdir -p install/usr/lib/jvm/$(COMPACT_PROFILE_IMAGE_DIR)
