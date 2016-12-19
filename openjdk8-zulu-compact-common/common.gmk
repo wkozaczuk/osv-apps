@@ -13,14 +13,10 @@ java8_jdk_tarball_url = $(shell ./latest.sh)
 
 SRC = $(shell readlink -f ../..)
 
-COMPACT_PROFILE_IMAGE_DIR=j2re-compact$(PROFILE_NUMBER)-image
-
 module:
-	cd $(SRC)/java && mvn package -q -DskipTests=true
-	rm -rf upstream
 	mkdir -p upstream
-	cd upstream && git clone https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git
-	cd upstream/openjdk8_compact_profiles_builder && ./build_compact_profile.sh $(java8_jdk_tarball_url) $(PROFILE_NUMBER)
+	cd upstream && (git -C openjdk8_compact_profiles_builder pull || git clone https://github.com/wkozaczuk/openjdk8_compact_profiles_builder.git openjdk8_compact_profiles_builder)
+	cd upstream/openjdk8_compact_profiles_builder && ./build_compact_profile.sh $(java8_jdk_tarball_url) $(PROFILE_NUMBER) $(ADD_JAVA_BEANS)
 	rm -rf install
 	mkdir -p install/usr/lib/jvm/$(COMPACT_PROFILE_IMAGE_DIR)
 	mv upstream/openjdk8_compact_profiles_builder/work/build/linux-x86_64-normal-server-release/images/$(COMPACT_PROFILE_IMAGE_DIR) $(jvm_dir)/$(COMPACT_PROFILE_IMAGE_DIR)/jre
@@ -32,5 +28,3 @@ module:
 
 clean:
 	rm -rf upstream install
-	cd $(SRC)/java && mvn clean -q
-	-rm -f dependency-reduced-pom.xml

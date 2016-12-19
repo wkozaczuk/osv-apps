@@ -1,4 +1,4 @@
-VERSION:=2.4.0
+VERSION:=2.4.2
 NAME:=elasticsearch
 DIR:=$(NAME)-$(VERSION)
 TARBALL:=$(DIR).tar.gz
