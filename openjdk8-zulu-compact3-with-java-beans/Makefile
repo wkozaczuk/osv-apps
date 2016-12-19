@@ -5,8 +5,9 @@
 # BSD license as described in the LICENSE file in the top-level directory.
 #
 
-PROFILE_NUMBER=2
-COMPACT_PROFILE_IMAGE_DIR=j2re-compact$(PROFILE_NUMBER)-image
+PROFILE_NUMBER=3
+COMPACT_PROFILE_IMAGE_DIR=j2re-compact$(PROFILE_NUMBER)-with-java-beans-image
+ADD_JAVA_BEANS=add_java_beans
 include ../openjdk8-zulu-compact-common/common.gmk
 
 .PHONY: module clean

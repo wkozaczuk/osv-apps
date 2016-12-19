@@ -4,19 +4,11 @@
 # This work is open source software, licensed under the terms of the
 # BSD license as described in the LICENSE file in the top-level directory.
 #
-
 from osv.modules.filemap import FileMap
 from osv.modules import api
-import os, os.path
 
+api.require('java-cmd')
 provides = ['java']
-
-api.require('fonts')
-api.require('ca-certificates')
-api.require('libz')
-api.require('josvsym')
-api.require('httpserver-jolokia-plugin')
-api.require('httpserver-jvm-plugin')
 
 usr_files = FileMap()
 usr_files.add('${OSV_BASE}/apps/openjdk8-fedora/install').to('/').allow_symlink()
