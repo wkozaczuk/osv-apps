@@ -15,11 +15,10 @@ default = api.run(
 '  -XX:+HeapDumpOnOutOfMemoryError '
 '  -XX:+DisableExplicitGC '
 '  -Dfile.encoding=UTF-8 '
-'  -Dosv.java.diagnostics '
 '  -Djna.nosys=true '
 '  -Des.insecure.allow.root=true '
 '  -Des.path.home=/elasticsearch '
 '  -Des.foreground=true '
-' -cp /elasticsearch/lib/elasticsearch-2.4.0.jar:/elasticsearch/lib/* '
+' -cp /elasticsearch/lib/elasticsearch-2.4.2.jar:/elasticsearch/lib/* '
 ' org.elasticsearch.bootstrap.Elasticsearch '
 ' start ')
