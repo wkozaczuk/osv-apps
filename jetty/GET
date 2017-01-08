@@ -7,4 +7,4 @@ wget "http://eclipse.org/downloads/download.php?file=/jetty/${JETTY_VERSION}/dis
 tar zxvf jetty.tgz --strip-components=1
 sed '/<!--$/d;/^ *-->$/d' demo-base/webapps/test.d/override-web.xml >/tmp/$$.xml
 mv /tmp/$$.xml demo-base/webapps/test.d/override-web.xml
-
+rm -f lib/setuid/libsetuid-osx.so
