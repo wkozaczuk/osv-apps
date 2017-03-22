@@ -3,7 +3,7 @@
 # Build a directory from the upstream redis 
 set -e
 
-VERSION=3.0.1
+VERSION=3.2.8
 mkdir upstream
 cd upstream
 wget https://github.com/antirez/redis/archive/$VERSION.tar.gz
