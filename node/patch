@@ -22,8 +22,3 @@ ed -s common.gypi << EOF
 ,s/'cflags':.*'-pthread'/&, '-fPIC'/
 w
 EOF
-
-[ -f deps/v8/src/types.h ] && ed -s deps/v8/src/types.h <<EOF
-,s/nearbyint/rint/
-w
-EOF
