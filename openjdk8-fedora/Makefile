@@ -55,7 +55,10 @@ module:
 	mkdir -p install/usr
 	ln -s lib install/usr/lib64
 	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id)
-	ln -sf java-1.8.0-openjdk-$(java_version).x86_64 $(jvm_dir)/java
+	# Move the versioned java directory to the generic "java" name, but
+	# keep a link at the versioned name:
+	mv $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64 $(jvm_dir)/java
+	ln -sf java $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
 	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id)
