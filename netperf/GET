@@ -7,8 +7,9 @@ rm -rf upstream
 
 mkdir upstream
 cd upstream
-wget ftp://ftp.netperf.org/netperf/netperf-$VERSION.tar.bz2
-tar jxf netperf-$VERSION.tar.bz2
+wget https://codeload.github.com/HewlettPackard/netperf/zip/netperf-$VERSION -O netperf-$VERSION.zip
+unzip netperf-$VERSION.zip
+mv netperf-netperf-$VERSION netperf-$VERSION
 cd netperf-$VERSION
 
 ./configure
