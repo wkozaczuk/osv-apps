@@ -10,7 +10,7 @@ module: usr.manifest
 usr.manifest: $(SRC)/lighttpd.so
 	echo '[manifest]' > usr.manifest
 	echo '/lighttpd.so: $${MODULE_DIR}/$(SRC)/lighttpd.so' >> usr.manifest
-	ldd $(SRC)/lighttpd.so | grep -v 'libc.so\|libpthread.so\|libdl.so' |\
+	ldd $(SRC)/lighttpd.so | grep -v 'libc.so\|libpthread.so\|libdl.so\|=>\W*(' |\
 		sed -n 's/ *[^ ] *\(.*\) => \(.*\) .*/\/\1: \2/p' \
 		>> usr.manifest
 	ls upstream/lighttpd/src/.libs/*.so | sed 's/\(.*\)\/mod_\(.*\)/\/lighttpd\/lib\/mod_\2: $${MODULE_DIR}\/upstream\/lighttpd\/src\/.libs\/mod_\2/' >> usr.manifest
