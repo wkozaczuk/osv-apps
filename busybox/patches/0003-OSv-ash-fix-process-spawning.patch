@@ -1,0 +1,263 @@
+From 5660683a32c95e95a87d712332d0ba6302f5a546 Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Mon, 7 Aug 2017 09:08:52 +0200
+Subject: [PATCH 3/3] OSv: ash fix process spawning
+
+OSv or Linux build is selected with OSV_BUILD flag in include/busybox.h.
+
+fork is ignored, and we pretend 0 is returned, so that child code does
+get executed.
+execve is replaced with osv_execve.
+To wait on process termination, osv_waittid is used.
+
+A few additional exit() calls have to be skipped.
+A few additonal function do return in OSv, so remove NORETURN from their
+declaration.
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ include/busybox.h          |  7 +++++++
+ libbb/vfork_daemon_rexec.c | 18 +++++++++++++++++
+ shell/ash.c                | 50 +++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 72 insertions(+), 3 deletions(-)
+
+diff --git a/include/busybox.h b/include/busybox.h
+index 6a003d5..6c13e27 100644
+--- a/include/busybox.h
++++ b/include/busybox.h
+@@ -5,6 +5,13 @@
+ #ifndef BUSYBOX_H
+ #define BUSYBOX_H 1
+ 
++/* ============ OSv helpers */
++#define OSV_BUILD 1
++extern int osv_execve(const char *path, char *const argv[], char *const envp[],
++    long *thread_id, int notification_fd) __attribute__((weak));
++extern long osv_waittid(long tid, int *status, int options) __attribute__((weak));
++#include <assert.h>
++
+ #include "libbb.h"
+ /* BB_DIR_foo and BB_SUID_bar constants: */
+ #include "applet_metadata.h"
+diff --git a/libbb/vfork_daemon_rexec.c b/libbb/vfork_daemon_rexec.c
+index 576534e..8e82713 100644
+--- a/libbb/vfork_daemon_rexec.c
++++ b/libbb/vfork_daemon_rexec.c
+@@ -25,17 +25,28 @@ pid_t FAST_FUNC spawn(char **argv)
+ 	/* Compiler should not optimize stores here */
+ 	volatile int failed;
+ 	pid_t pid;
++#if OSV_BUILD
++	pid_t pid2 = -1;
++#endif
+ 
+ 	fflush_all();
+ 
+ 	/* Be nice to nommu machines. */
+ 	failed = 0;
++#if OSV_BUILD == 0
+ 	pid = vfork();
++#else
++	pid = 0;
++#endif
+ 	if (pid < 0) /* error */
+ 		return pid;
+ 	if (!pid) { /* child */
+ 		/* This macro is ok - it doesn't do NOEXEC/NOFORK tricks */
++#if OSV_BUILD == 0
+ 		BB_EXECVP(argv[0], argv);
++#else
++		osv_execve(argv[0], argv, NULL, (long*)&pid2, -1);
++#endif
+ 
+ 		/* We are (maybe) sharing a stack with blocked parent,
+ 		 * let parent know we failed and then exit to unblock parent
+@@ -44,7 +55,9 @@ pid_t FAST_FUNC spawn(char **argv)
+ 		failed = errno;
+ 		/* mount, for example, does not want the message */
+ 		/*bb_perror_msg("can't execute '%s'", argv[0]);*/
++#if OSV_BUILD == 0
+ 		_exit(111);
++#endif
+ 	}
+ 	/* parent */
+ 	/* Unfortunately, this is not reliable: according to standards
+@@ -57,7 +70,11 @@ pid_t FAST_FUNC spawn(char **argv)
+ 		errno = failed;
+ 		return -1;
+ 	}
++#if OSV_BUILD == 0
+ 	return pid;
++#else
++	return pid2;
++#endif
+ }
+ 
+ /* Die with an error message if we can't spawn a child process. */
+@@ -159,6 +176,7 @@ int FAST_FUNC spawn_and_wait(char **argv)
+ 	int rc;
+ #if ENABLE_FEATURE_PREFER_APPLETS && (NUM_APPLETS > 1)
+ 	int a = find_applet_by_name(argv[0]);
++	// printf("DBG %s:%d-%s: a=%d, argv[0]=%s.\n", __FILE__, __LINE__, __FUNCTION__, a, argv[0]);
+ 
+ 	if (a >= 0) {
+ 		if (APPLET_IS_NOFORK(a))
+diff --git a/shell/ash.c b/shell/ash.c
+index 1df4dda..bc16394 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -460,7 +460,7 @@ var_end(const char *var)
+ 
+ /* ============ Interrupts / exceptions */
+ 
+-static void exitshell(void) NORETURN;
++static void exitshell(void) /*NORETURN*/;
+ 
+ /*
+  * These macros allow the user to suspend the handling of interrupt signals
+@@ -4944,7 +4944,9 @@ forkchild(struct job *jp, union node *n, int mode)
+ 		ignoresig(SIGINT);
+ 		ignoresig(SIGQUIT);
+ 		if (jp->nprocs == 0) {
++#if OSV_BUILD == 0
+ 			close(0);
++#endif
+ 			if (open(bb_dev_null, O_RDONLY) != 0)
+ 				ash_msg_and_raise_error("can't open '%s'", bb_dev_null);
+ 		}
+@@ -5030,7 +5032,11 @@ forkshell(struct job *jp, union node *n, int mode)
+ 	int pid;
+ 
+ 	TRACE(("forkshell(%%%d, %p, %d) called\n", jobno(jp), n, mode));
++#if OSV_BUILD == 0
+ 	pid = fork();
++#else
++	pid = 0;
++#endif
+ 	if (pid < 0) {
+ 		TRACE(("Fork failed, errno=%d", errno));
+ 		if (jp)
+@@ -5041,6 +5047,10 @@ forkshell(struct job *jp, union node *n, int mode)
+ 		CLEAR_RANDOM_T(&random_gen); /* or else $RANDOM repeats in child */
+ 		forkchild(jp, n, mode);
+ 	} else {
++		// TODO: In OSv, forkparent will not be called.
++		// Because of that, jobs might not will work as expected.
++		// Apps are just started in background, and they finish at some time.
++		// Shell might not be able to wait on them to finish.
+ 		forkparent(jp, n, mode, pid);
+ 	}
+ 	return pid;
+@@ -7713,7 +7723,21 @@ tryexec(IF_FEATURE_SH_STANDALONE(int applet_no,) char *cmd, char **argv, char **
+ 		execve(cmd, argv, envp);
+ 	} while (errno == EINTR);
+ #else
++	// printf("DBG %s:%d-%s: cmd=%s, argv[0]=%s.\n", __FILE__, __LINE__, __FUNCTION__, cmd, argv[0]);
++#if OSV_BUILD == 0
+ 	execve(cmd, argv, envp);
++#else
++	{
++		int ret = 0;
++		pid_t ch_pid = -1;
++		ret = osv_execve(cmd, argv, envp, (long*)&ch_pid, -1);
++		//errno = 0; // osv_execve should clear errno on success
++		if(ret)
++			errno = ENOSYS;
++		osv_waittid(ch_pid, NULL, 0);
++		return;
++	}
++#endif
+ #endif
+ 	if (cmd != (char*) bb_busybox_exec_path && errno == ENOEXEC) {
+ 		/* Run "cmd" as a shell script:
+@@ -7748,7 +7772,7 @@ tryexec(IF_FEATURE_SH_STANDALONE(int applet_no,) char *cmd, char **argv, char **
+  * have to change the find_command routine as well.
+  * argv[-1] must exist and be writable! See tryexec() for why.
+  */
+-static void shellexec(char *prog, char **argv, const char *path, int idx) NORETURN;
++static void shellexec(char *prog, char **argv, const char *path, int idx) /*NORETURN*/;
+ static void shellexec(char *prog, char **argv, const char *path, int idx)
+ {
+ 	char *cmdname;
+@@ -7764,6 +7788,7 @@ static void shellexec(char *prog, char **argv, const char *path, int idx)
+ #endif
+ 	) {
+ 		tryexec(IF_FEATURE_SH_STANDALONE(applet_no,) prog, argv, envp);
++		// printf("DBG %s:%d-%s after tryexec(%s, argv[0]=%s, ...), errno=%p %d, idx=%d\n", __FILE__,__LINE__,__FUNCTION__, prog, argv[0], &errno, errno, idx); fflush(stdout);
+ 		if (applet_no >= 0) {
+ 			/* We tried execing ourself, but it didn't work.
+ 			 * Maybe /proc/self/exe doesn't exist?
+@@ -7785,6 +7810,12 @@ static void shellexec(char *prog, char **argv, const char *path, int idx)
+ 		}
+ 	}
+ 
++#if OSV_BUILD
++	// OSv, tryexec succedded, don't continue with error path
++	if(e == 0)
++		return;
++#endif
++
+ 	/* Map to POSIX errors */
+ 	switch (e) {
+ 	case EACCES:
+@@ -9778,6 +9809,12 @@ evalcommand(union node *cmd, int flags)
+ 		listsetvar(varlist.list, VEXPORT|VSTACK);
+ 		shellexec(argv[0], argv, path, cmdentry.u.index);
+ 		/* NOTREACHED */
++#if OSV_BUILD
++		// printf("DBG %s:%d-%s shellexec returned\n", __FILE__,__LINE__,__FUNCTION__);
++		status = 0;
++		exitstatus = 0;
++		break;
++#endif
+ 	} /* default */
+ 	case CMDBUILTIN:
+ 		cmdenviron = varlist.list;
+@@ -10357,7 +10394,9 @@ closescript(void)
+ 	popallfiles();
+ 	if (g_parsefile->pf_fd > 0) {
+ 		close(g_parsefile->pf_fd);
+-		g_parsefile->pf_fd = 0;
++		// set it to -1, to prevent reading from fd=0 in preadfd and nonblock_immune_read.
++		// On OSv, stdin is always available.
++		g_parsefile->pf_fd = -1;
+ 	}
+ }
+ 
+@@ -12587,6 +12626,7 @@ cmdloop(int top)
+ 			inter++;
+ 			chkmail();
+ 		}
++		// printf("DBG %s:%d-%s inter=%d\n", __FILE__,__LINE__,__FUNCTION__, inter);
+ 		n = parsecmd(inter);
+ #if DEBUG
+ 		if (DEBUG > 2 && debug && (n != NODE_EOF))
+@@ -13382,7 +13422,9 @@ exitshell(void)
+ 	 */
+ 	setjobctl(0);
+ 	flush_stdout_stderr();
++#if OSV_BUILD==0
+ 	_exit(status);
++#endif
+ 	/* NOTREACHED */
+ }
+ 
+@@ -13592,6 +13634,7 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 		s = state;
+ 		if (e == EXEXIT || s == 0 || iflag == 0 || shlvl) {
+ 			exitshell();
++			return 0; // for OSv only
+ 		}
+ 		if (e == EXINT) {
+ 			newline_and_flush(stderr);
+@@ -13694,6 +13737,7 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ #endif
+ 	TRACE(("End of main reached\n"));
+ 	exitshell();
++	return 0; // // for OSv only. Or return errno ?
+ 	/* NOTREACHED */
+ }
+ 
+-- 
+2.9.4
+

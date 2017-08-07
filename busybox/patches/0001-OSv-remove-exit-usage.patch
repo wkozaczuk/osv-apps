@@ -1,0 +1,190 @@
+From 12453fd712c7874609eb4bcb2246a37c00571161 Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Thu, 3 Aug 2017 09:53:51 +0200
+Subject: [PATCH 1/3] OSv: remove exit() usage
+
+exit() would shutdown whole OSv VM, remove it.
+This requires removing noreturn attribute from related functions.
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ include/libbb.h    |  6 +++---
+ libbb/appletlib.c  | 28 ++++++++++++++--------------
+ libbb/verror_msg.c |  2 +-
+ libbb/xfunc_die.c  |  4 ++--
+ 4 files changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/include/libbb.h b/include/libbb.h
+index 8eccd81..bef7437 100644
+--- a/include/libbb.h
++++ b/include/libbb.h
+@@ -1108,7 +1108,7 @@ int spawn_and_wait(char **argv) FAST_FUNC;
+ int run_nofork_applet(int applet_no, char **argv) FAST_FUNC;
+ #ifndef BUILD_INDIVIDUAL
+ extern int find_applet_by_name(const char *name) FAST_FUNC;
+-extern void run_applet_no_and_exit(int a, const char *name, char **argv) NORETURN FAST_FUNC;
++extern int run_applet_no_and_exit(int a, const char *name, char **argv) /*NORETURN*/ FAST_FUNC;
+ #endif
+ 
+ /* Helpers for daemonization.
+@@ -1243,8 +1243,8 @@ extern smallint syslog_level;
+ extern smallint logmode;
+ extern uint8_t xfunc_error_retval;
+ extern void (*die_func)(void);
+-extern void xfunc_die(void) NORETURN FAST_FUNC;
+-extern void bb_show_usage(void) NORETURN FAST_FUNC;
++extern int xfunc_die(void) /*NORETURN*/ FAST_FUNC;
++extern int bb_show_usage(void) /*NORETURN*/ FAST_FUNC;
+ extern void bb_error_msg(const char *s, ...) __attribute__ ((format (printf, 1, 2))) FAST_FUNC;
+ extern void bb_error_msg_and_die(const char *s, ...) __attribute__ ((noreturn, format (printf, 1, 2))) FAST_FUNC;
+ extern void bb_perror_msg(const char *s, ...) __attribute__ ((format (printf, 1, 2))) FAST_FUNC;
+diff --git a/libbb/appletlib.c b/libbb/appletlib.c
+index df65849..c3e54a8 100644
+--- a/libbb/appletlib.c
++++ b/libbb/appletlib.c
+@@ -130,7 +130,7 @@ static const char *unpack_usage_messages(void)
+ #endif /* FEATURE_COMPRESS_USAGE */
+ 
+ 
+-void FAST_FUNC bb_show_usage(void)
++int FAST_FUNC bb_show_usage(void)
+ {
+ 	if (ENABLE_SHOW_USAGE) {
+ #ifdef SINGLE_APPLET_STR
+@@ -152,7 +152,7 @@ void FAST_FUNC bb_show_usage(void)
+ 		int ap = find_applet_by_name(applet_name);
+ 
+ 		if (ap < 0) /* never happens, paranoia */
+-			xfunc_die();
++			return xfunc_die();
+ 		while (ap) {
+ 			while (*p++) continue;
+ 			ap--;
+@@ -172,7 +172,7 @@ void FAST_FUNC bb_show_usage(void)
+ 			dealloc_usage_messages((char*)usage_string);
+ #endif
+ 	}
+-	xfunc_die();
++	return xfunc_die();
+ }
+ 
+ int FAST_FUNC find_applet_by_name(const char *name)
+@@ -329,7 +329,7 @@ void lbb_prepare(const char *applet
+ 		/* Special case. POSIX says "test --help"
+ 		 * should be no different from e.g. "test --foo".  */
+ 		if (!ENABLE_TEST || strcmp(applet_name, "test") != 0)
+-			bb_show_usage();
++			return bb_show_usage();
+ 	}
+ #endif
+ }
+@@ -748,7 +748,7 @@ static void install_links(const char *busybox UNUSED_PARAM,
+ # endif
+ 
+ # if ENABLE_BUSYBOX
+-static void run_applet_and_exit(const char *name, char **argv) NORETURN;
++static int run_applet_and_exit(const char *name, char **argv) /*NORETURN*/;
+ 
+ /* If we were called as "busybox..." */
+ static int busybox_main(char **argv)
+@@ -872,12 +872,12 @@ static int busybox_main(char **argv)
+ 	/* We support "busybox /a/path/to/applet args..." too. Allows for
+ 	 * "#!/bin/busybox"-style wrappers */
+ 	applet_name = bb_get_last_path_component_nostrip(argv[0]);
+-	run_applet_and_exit(applet_name, argv);
++	return run_applet_and_exit(applet_name, argv);
+ }
+ # endif
+ 
+ # if NUM_APPLETS > 0
+-void FAST_FUNC run_applet_no_and_exit(int applet_no, const char *name, char **argv)
++int FAST_FUNC run_applet_no_and_exit(int applet_no, const char *name, char **argv)
+ {
+ 	int argc = string_array_len(argv);
+ 
+@@ -908,30 +908,30 @@ void FAST_FUNC run_applet_no_and_exit(int applet_no, const char *name, char **ar
+ 		if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+ 			/* Make "foo --help" exit with 0: */
+ 			xfunc_error_retval = 0;
+-			bb_show_usage();
++			return bb_show_usage();
+ 		}
+ 	}
+ 	if (ENABLE_FEATURE_SUID)
+ 		check_suid(applet_no);
+ 	xfunc_error_retval = applet_main[applet_no](argc, argv);
+ 	/* Note: applet_main() may also not return (die on a xfunc or such) */
+-	xfunc_die();
++	return xfunc_die();
+ }
+ # endif /* NUM_APPLETS > 0 */
+ 
+ # if ENABLE_BUSYBOX || NUM_APPLETS > 0
+-static NORETURN void run_applet_and_exit(const char *name, char **argv)
++static /*NORETURN*/ int run_applet_and_exit(const char *name, char **argv)
+ {
+ #  if ENABLE_BUSYBOX
+ 	if (is_prefixed_with(name, "busybox"))
+-		exit(busybox_main(argv));
++		return busybox_main(argv);
+ #  endif
+ #  if NUM_APPLETS > 0
+ 	/* find_applet_by_name() search is more expensive, so goes second */
+ 	{
+ 		int applet = find_applet_by_name(name);
+ 		if (applet >= 0)
+-			run_applet_no_and_exit(applet, name, argv);
++			return run_applet_no_and_exit(applet, name, argv);
+ 	}
+ #  endif
+ 
+@@ -939,7 +939,7 @@ static NORETURN void run_applet_and_exit(const char *name, char **argv)
+ 	full_write2_str(applet_name);
+ 	full_write2_str(": applet not found\n");
+ 	/* POSIX: "If a command is not found, the exit status shall be 127" */
+-	exit(127);
++	return 127;
+ }
+ # endif
+ 
+@@ -1029,7 +1029,7 @@ int main(int argc UNUSED_PARAM, char **argv)
+ 		applet_name++;
+ 	applet_name = bb_basename(applet_name);
+ 	parse_config_file(); /* ...maybe, if FEATURE_SUID_CONFIG */
+-	run_applet_and_exit(applet_name, argv);
++	return run_applet_and_exit(applet_name, argv);
+ 
+ #endif
+ }
+diff --git a/libbb/verror_msg.c b/libbb/verror_msg.c
+index 22c3035..2e20eb9 100644
+--- a/libbb/verror_msg.c
++++ b/libbb/verror_msg.c
+@@ -169,7 +169,7 @@ void FAST_FUNC bb_error_msg_and_die(const char *s, ...)
+ 	va_start(p, s);
+ 	bb_verror_msg(s, p, NULL);
+ 	va_end(p);
+-	xfunc_die();
++	exit(xfunc_die());
+ }
+ 
+ void FAST_FUNC bb_error_msg(const char *s, ...)
+diff --git a/libbb/xfunc_die.c b/libbb/xfunc_die.c
+index 73f7998..76a8541 100644
+--- a/libbb/xfunc_die.c
++++ b/libbb/xfunc_die.c
+@@ -14,9 +14,9 @@
+ 
+ void (*die_func)(void);
+ 
+-void FAST_FUNC xfunc_die(void)
++int FAST_FUNC xfunc_die(void)
+ {
+ 	if (die_func)
+ 		die_func();
+-	exit(xfunc_error_retval);
++	return xfunc_error_retval;
+ }
+-- 
+2.9.4
+

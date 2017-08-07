@@ -1,0 +1,55 @@
+From b66f0eeeedd028d6d4e187addb5107b22bc22a73 Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Fri, 4 Aug 2017 09:45:04 +0200
+Subject: [PATCH 2/3] ash: include file,line,function into TRACE output
+
+Just my personal preference. It makes easier to throw only
+TRACE(("line-visited\n"));
+at random places to figure out, which code path is actually executed.
+
+Unfortunately this now doesn't work:
+if (flag) TRACE(("aa")); else TRACE(("bb"));
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ shell/ash.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/shell/ash.c b/shell/ash.c
+index 7a11305..1df4dda 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -418,7 +418,10 @@ extern struct globals_misc *const ash_ptr_to_globals_misc;
+ #if DEBUG
+ static void trace_printf(const char *fmt, ...);
+ static void trace_vprintf(const char *fmt, va_list va);
+-# define TRACE(param)    trace_printf param
++static int ss_line;
++static const char* ss_file;
++static const char* ss_func;
++# define TRACE(param)    { ss_line=__LINE__; ss_file=__FILE__; ss_func=__FUNCTION__; trace_printf param ; }
+ # define TRACEV(param)   trace_vprintf param
+ # define close(fd) do { \
+ 	int dfd = (fd); \
+@@ -874,6 +877,7 @@ trace_printf(const char *fmt, ...)
+ 		fprintf(tracefile, "[%u] ", (int) getpid());
+ 	if (DEBUG_SIG)
+ 		fprintf(tracefile, "pending s:%d i:%d(supp:%d) ", pending_sig, pending_int, suppress_int);
++	fprintf(tracefile, "%s:%d=%s: ", ss_file, ss_line, ss_func);
+ 	va_start(va, fmt);
+ 	vfprintf(tracefile, fmt, va);
+ 	va_end(va);
+@@ -12381,8 +12385,9 @@ readtoken(void)
+  out:
+ 	checkkwd = 0;
+ #if DEBUG
+-	if (!alreadyseen)
++	if (!alreadyseen) {
+ 		TRACE(("token '%s' %s\n", tokname_array[t], t == TWORD ? wordtext : ""));
++	}
+ 	else
+ 		TRACE(("reread token '%s' %s\n", tokname_array[t], t == TWORD ? wordtext : ""));
+ #endif
+-- 
+2.9.4
+
