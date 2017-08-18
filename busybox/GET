@@ -34,6 +34,9 @@ cat <<EOF > usr.manifest
 /usr/lib/echo: ->/usr/lib/busybox
 /usr/lib/ping: ->/usr/lib/busybox
 #
+# Link /usr/bin (in ash's default PATH) to /usr/lib where we put the executables
+/usr/bin: ->/usr/lib
+#
 # test scripts
 ## /**: \${MODULE_DIR}/test-script/**
 

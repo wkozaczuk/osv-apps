@@ -1,0 +1,39 @@
+From 1512e2b29f3d5c19d0735470d74c546bd15ed15a Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Fri, 18 Aug 2017 07:01:58 +0200
+Subject: [PATCH 4/5] OSv ash: fix command not found error message when command
+ was found
+
+Running simple 'ls' in ash showed directory content. But at the end,
+spurious error message 'command not found' was shown. This was due to
+errno not being cleared by osv_execve. This was fixed in osv_execve, now
+it clears errno on success, or sets it to meanigful value (currently
+always ENOENT).
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ shell/ash.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/shell/ash.c b/shell/ash.c
+index bc16394..dc88bd8 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -7731,10 +7731,10 @@ tryexec(IF_FEATURE_SH_STANDALONE(int applet_no,) char *cmd, char **argv, char **
+ 		int ret = 0;
+ 		pid_t ch_pid = -1;
+ 		ret = osv_execve(cmd, argv, envp, (long*)&ch_pid, -1);
+-		//errno = 0; // osv_execve should clear errno on success
+-		if(ret)
+-			errno = ENOSYS;
+-		osv_waittid(ch_pid, NULL, 0);
++		// osv_execve now clears errno on success, as expected by caller.
++		if(ret == 0) {
++			osv_waittid(ch_pid, NULL, 0);
++		}
+ 		return;
+ 	}
+ #endif
+-- 
+2.9.4
+

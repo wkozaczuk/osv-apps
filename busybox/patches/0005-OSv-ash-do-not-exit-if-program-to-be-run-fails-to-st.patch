@@ -1,0 +1,140 @@
+From 1009e202f7c1214e7ab6185782f1033506a634a8 Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Fri, 18 Aug 2017 07:26:12 +0200
+Subject: [PATCH 5/5] OSv ash: do not exit if program to be run fails to start
+
+If program to be started fails to start (executable file not found), ash
+should not return from its main loop, as this terminates shell.
+
+ash_main interceps exception from raise_exception, and exits because
+exception_type == EXEXIT. The exit is avoided if instead of returning from
+ash_main, code just continues with cmdloop(). Important detail - we have
+to first call popstackmark, and there re-execute setjmp, so that longjmp
+will work.
+
+As EXEXIT is used for both abnormal exit (exception handling, like
+file not found) and normal exit (entering 'exit' cmd into ash), this
+breaks 'exit' cmd. Thus we have to separete the two cases.
+This is done by replacing EXEXIT with:
+ - EXEXIT_CMD, when 'exit' was passed to ash interpreter.
+ - EXEXIT_VAR, for all other reasons.
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ shell/ash.c | 44 +++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 37 insertions(+), 7 deletions(-)
+
+diff --git a/shell/ash.c b/shell/ash.c
+index dc88bd8..d8111c0 100644
+--- a/shell/ash.c
++++ b/shell/ash.c
+@@ -324,7 +324,9 @@ struct globals_misc {
+ 	/* exceptions */
+ #define EXINT 0         /* SIGINT received */
+ #define EXERROR 1       /* a generic error */
+-#define EXEXIT 4        /* exit the shell */
++//#define EXEXIT 4        /* exit the shell */
++#define EXEXIT_CMD 4    /* exit the shell, due to exit command */
++#define EXEXIT_VAR 5    /* exit the shell, due to other reasons */
+ 
+ 	smallint isloginsh;
+ 	char nullstr[1];        /* zero length string */
+@@ -7831,7 +7833,7 @@ static void shellexec(char *prog, char **argv, const char *path, int idx)
+ 	exitstatus = exerrno;
+ 	TRACE(("shellexec failed for %s, errno %d, suppress_int %d\n",
+ 		prog, e, suppress_int));
+-	ash_msg_and_raise(EXEXIT, "%s: %s", prog, errmsg(e, "not found"));
++	ash_msg_and_raise(EXEXIT_VAR, "%s: %s", prog, errmsg(e, "not found"));
+ 	/* NOTREACHED */
+ }
+ 
+@@ -8850,9 +8852,9 @@ evaltree(union node *n, int flags)
+ 	dotrap();
+ 
+ 	if (checkexit & status)
+-		raise_exception(EXEXIT);
++		raise_exception(EXEXIT_VAR);
+ 	if (flags & EV_EXIT)
+-		raise_exception(EXEXIT);
++		raise_exception(EXEXIT_VAR);
+ 
+ 	TRACE(("leaving evaltree (no interrupts)\n"));
+ 	return exitstatus;
+@@ -12756,7 +12758,7 @@ exitcmd(int argc UNUSED_PARAM, char **argv)
+ 		return 0;
+ 	if (argv[1])
+ 		exitstatus = number(argv[1]);
+-	raise_exception(EXEXIT);
++	raise_exception(EXEXIT_CMD);
+ 	/* NOTREACHED */
+ }
+ 
+@@ -13404,7 +13406,7 @@ exitshell(void)
+ 	status = exitstatus;
+ 	TRACE(("pid %d, exitshell(%d)\n", getpid(), status));
+ 	if (setjmp(loc.loc)) {
+-		if (exception_type == EXEXIT)
++		if (exception_type == EXEXIT_CMD || exception_type == EXEXIT_VAR)
+ 			status = exitstatus;
+ 		goto out;
+ 	}
+@@ -13624,6 +13626,8 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 	line_input_state = new_line_input_t(FOR_SHELL | WITH_PATH_LOOKUP);
+ #endif
+ 	state = 0;
++do_setjmp:
++	// fprintf(stderr, "DBG BEFORE setjmp state=%d...\n", state); fflush(stderr);
+ 	if (setjmp(jmploc.loc)) {
+ 		smallint e;
+ 		smallint s;
+@@ -13632,10 +13636,30 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 
+ 		e = exception_type;
+ 		s = state;
+-		if (e == EXEXIT || s == 0 || iflag == 0 || shlvl) {
++		// fprintf(stderr, "DBG AFTER setjmp, ret=true e=%d state=%d iflag=%d shlvl=%d\n", e,s,iflag,shlvl); fflush(stderr);
++		if (e == EXEXIT_CMD) {
++			// exit was explicitly requested, so do it.
++			// TODO - whas it requested in top level shell, or in subshell/interpreted script?
++			// exit in called script should not terminate parent shell.
+ 			exitshell();
+ 			return 0; // for OSv only
+ 		}
++		if (e == EXEXIT_VAR || s == 0 || iflag == 0 || shlvl) {
++			exitshell();
++			/*
++			After exception, we went out of cmdloop via longjmp.
++			In OSv, return would terminate the only thread we have (while
++			in linux, it would terminate a subprocess).
++			Do not return, just let current thread continue, and
++			it will go back into cmdloop.
++
++			"let current thread continue" - this requires to re-execute setjmp.
++			Then, we have to go into state4 (as s == 4) - we have to skip states 1,2,3.
++			*/
++			popstackmark(&smark);
++			goto do_setjmp;
++
++		}
+ 		if (e == EXINT) {
+ 			newline_and_flush(stderr);
+ 		}
+@@ -13650,9 +13674,15 @@ int ash_main(int argc UNUSED_PARAM, char **argv)
+ 			goto state3;
+ 		goto state4;
+ 	}
++	// fprintf(stderr, "DBG AFTER setjmp, ret=false iflag=%d...\n", iflag); fflush(stderr);
++
+ 	exception_handler = &jmploc;
+ 	rootpid = getpid();
+ 
++	if (state == 4)
++		goto state4; // OSv special case
++	assert(state == 0); // normal, initial execution path
++
+ 	init();
+ 	setstackmark(&smark);
+ 	procargs(argv);
+-- 
+2.9.4
+
