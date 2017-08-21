@@ -7,7 +7,7 @@ valid symlinks to busybox binary. Instead, only a few are included.
 
 A small test script is provided (commented out in usr.manifest).
 It can be run as:
-  scripts/run.py -e "--env=PATH=/usr/lib sleep 1.2; ash /cmd0.sh; echo Done"
+  scripts/run.py -e "sleep 1.2; ash /cmd0.sh; echo Done"
 
 You can also start an interactive shell with:
-  scripts/run.py -e "--env=PATH=/usr/lib ash"
+  scripts/run.py -e ash
