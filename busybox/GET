@@ -3,8 +3,8 @@
 set -e
 
 URL=https://github.com/mirror/busybox
-VERSION_GIT=1_27_stable
-VERSION_LIB=1.27.1
+VERSION_GIT=1_27_2
+VERSION_LIB=`echo $VERSION_GIT | sed 's/_/./g'`
 
 [ ! -d build ] && mkdir build
 cd build
