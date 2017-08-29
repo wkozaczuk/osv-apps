@@ -11,3 +11,15 @@ diff -ur iperf-2.0.5.orig/src/Makefile.in iperf-2.0.5/src/Makefile.in
  		Client.cpp \
  		Extractor.c \
 Only in iperf-2.0.5/src: Makefile.in~
+--- iperf-2.0.5.orig/configure.ac	2017-08-29 12:46:16.144503087 +0300
++++ iperf-2.0.5/configure.ac	2017-08-29 12:47:28.146712803 +0300
+@@ -167,8 +167,6 @@
+ dnl ===================================================================
+ dnl Check for compiler characteristics
+ 
+-DAST_CHECK_BOOL
+-
+ AC_C_BIGENDIAN
+ 
+ dnl ===================================================================
+
