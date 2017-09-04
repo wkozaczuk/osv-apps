@@ -1,0 +1,53 @@
+From 40a8b2fac59623a7833d04bd9fc094f1a34f0310 Mon Sep 17 00:00:00 2001
+From: Justin Cinkelj <justin.cinkelj@xlab.si>
+Date: Mon, 4 Sep 2017 21:39:00 +0200
+Subject: [PATCH] wrk: allow larger file descriptor values
+
+Wrk uses socket FD number as index into dynamicaly allocated arrays.
+With say 1 conection, max expected FD was 10+3*1.
+
+On OSv, once other apps consume some FDs, arbitrary large FDs can be seen.
+Wrk than fails to start. Avoid this by allowing significantly higher
+FD values.
+
+Signed-off-by: Justin Cinkelj <justin.cinkelj@xlab.si>
+---
+ src/ae.c  | 5 +++++
+ src/wrk.c | 4 +++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/ae.c b/src/ae.c
+index 90be4e2..f473626 100644
+--- a/src/ae.c
++++ b/src/ae.c
+@@ -105,7 +105,12 @@ void aeStop(aeEventLoop *eventLoop) {
+ int aeCreateFileEvent(aeEventLoop *eventLoop, int fd, int mask,
+         aeFileProc *proc, void *clientData)
+ {
++    // The eventLoop->setsize is set by:
++    //  ./src/wrk.c:145:        t->loop        = aeCreateEventLoop(10 + cfg.connections * 3);
++    // This is problematic on OSv. FD numbers are shared by all apps,
++    // and can get arbitrary large.
+     if (fd >= eventLoop->setsize) {
++        fprintf(stderr, "ERROR: wrk fd=%d > %d, increase setsize in wrk.c, aeCreateFileEvent()\n", fd, eventLoop->setsize);
+         errno = ERANGE;
+         return AE_ERR;
+     }
+diff --git a/src/wrk.c b/src/wrk.c
+index e64acae..14bd5e0 100644
+--- a/src/wrk.c
++++ b/src/wrk.c
+@@ -137,7 +137,9 @@ int main(int argc, char **argv) {
+ 
+     for (uint64_t i = 0; i < cfg.threads; i++) {
+         thread *t = &threads[i];
+-        t->loop        = aeCreateEventLoop(10 + cfg.connections * 3);
++        // "10 + cfg.connections * 3" is OK for Linux, and
++        // "+ 200" is required for OSv to allocate some extra space.
++        t->loop        = aeCreateEventLoop(10 + cfg.connections * 3 + 200);
+         t->connections = connections;
+         t->stop_at     = stop_at;
+ 
+-- 
+2.9.5
+
