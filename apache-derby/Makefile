@@ -1,11 +1,11 @@
 .PHONY: module
 
-VERSION := 10.10.2.0
+VERSION := 10.14.1.0
 
 module: ROOTFS
 
 db-derby-$(VERSION)-bin.tar.gz:
-	wget http://archive.apache.org/dist/db/derby/db-derby-10.10.2.0/db-derby-10.10.2.0-bin.tar.gz
+	wget http://archive.apache.org/dist/db/derby/db-derby-$(VERSION)/db-derby-$(VERSION)-bin.tar.gz
 
 ROOTFS/db-derby: db-derby-$(VERSION)-bin.tar.gz
 	mkdir -p ROOTFS/db-derby
