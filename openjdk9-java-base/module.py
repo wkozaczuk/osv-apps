@@ -12,8 +12,7 @@ api.require('java-non-isolated')
 provides = ['java']
 
 usr_files = FileMap()
-usr_files.add('${OSV_BASE}/apps/openjdk9-ea-java-base/install').to('/').allow_symlink()
-usr_files.add('${OSV_BASE}/apps/openjdk9-ea-java-base/install/usr/lib/jvm/java') \
+usr_files.add('${OSV_BASE}/apps/openjdk9-java-base/install').to('/').allow_symlink()
+usr_files.add('${OSV_BASE}/apps/openjdk9-java-base/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
-usr_files.link('/usr/lib/jvm/jre').to('/usr/lib/jvm/java/jre')
