@@ -13,6 +13,7 @@ ROOTFS/db-derby: db-derby-$(VERSION)-bin.tar.gz
 	cp -a db-derby-$(VERSION)-bin/lib ROOTFS/db-derby
 
 ROOTFS/db-derby/security.policy:
+	mkdir -p ROOTFS/db-derby
 	cp security.policy ROOTFS/db-derby
 
 ROOTFS: ROOTFS/db-derby ROOTFS/db-derby/security.policy
