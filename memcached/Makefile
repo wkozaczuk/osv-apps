@@ -16,10 +16,15 @@ sources := $(addprefix src/, $(sources))
 
 $(sources): src
 
-CFLAGS = -std=gnu99 -fpie -rdynamic -DHAVE_CONFIG_H
+# Sadly, because memcached uses getopt(), it no longer works as a PIE.
+# The full story is in issue #689.
+#CFLAGS = -std=gnu99 -fpie -rdynamic -DHAVE_CONFIG_H
+#LDFLAGS = -pie
+CFLAGS = -std=gnu99 -fpic -rdynamic -DHAVE_CONFIG_H
+LDFLAGS = -shared
 
 memcached: $(sources)
-	$(CC) -pie -o $@ $(CFLAGS) $(LDFLAGS) $(sources) -levent -lpthread
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(sources) -levent -lpthread
 
 clean:
 	rm -rf upstream src
