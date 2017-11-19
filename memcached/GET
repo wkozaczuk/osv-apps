@@ -2,16 +2,16 @@
 set -e
 VERSION=1.4.21
 
-mkdir src
-mkdir upstream
+mkdir upstream || :
 cd upstream
-wget http://www.memcached.org/files/memcached-$VERSION.tar.gz
+wget -c http://www.memcached.org/files/memcached-$VERSION.tar.gz
 tar zxvf memcached-$VERSION.tar.gz
 cd memcached-$VERSION
 ./configure
 
 cd ../..
 
+mkdir src
 for i in \
 	assoc.c config.h items.c protocol_binary.h stats.c util.c \
 	assoc.h daemon.c items.h sasl_defs.h stats.h util.h \
