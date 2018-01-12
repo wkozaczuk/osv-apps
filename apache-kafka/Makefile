@@ -3,7 +3,7 @@ VERSION:=0.8.2.1
 NAME:=kafka
 DIR:=kafka_$(SCALA)-$(VERSION)
 TARBALL:=$(DIR).tgz
-URL:=http://mirror.ventraip.net.au/apache/$(NAME)/$(VERSION)/$(TARBALL)
+URL:=http://archive.apache.org/dist/$(NAME)/$(VERSION)/$(TARBALL)
 
 
 module: ROOTFS usr.manifest
