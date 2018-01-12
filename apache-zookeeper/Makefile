@@ -2,7 +2,7 @@ VERSION:=3.4.6
 NAME:=zookeeper
 DIR:=$(NAME)-$(VERSION)
 TARBALL:=$(DIR).tar.gz
-URL:=http://apache.mirrors.ionfish.org/$(NAME)/$(NAME)-$(VERSION)/$(TARBALL)
+URL:=http://archive.apache.org/dist/$(NAME)/$(NAME)-$(VERSION)/$(TARBALL)
 
 
 module: ROOTFS usr.manifest
