@@ -2,7 +2,7 @@ VERSION:=5.11.1
 NAME:=activemq
 DIR:=apache-$(NAME)-$(VERSION)
 TARBALL:=$(DIR)-bin.tar.gz
-URL:=http://apache.mirror.digitalpacific.com.au/$(NAME)/$(VERSION)/$(TARBALL)
+URL:=http://archive.apache.org/dist/$(NAME)/$(VERSION)/$(TARBALL)
 
 module: ROOTFS usr.manifest
 
