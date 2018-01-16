@@ -7,7 +7,7 @@ rm -rf upstream
 
 mkdir upstream
 cd upstream
-wget https://codeload.github.com/HewlettPackard/netperf/zip/netperf-$VERSION -O netperf-$VERSION.zip
+wget -c https://codeload.github.com/HewlettPackard/netperf/zip/netperf-$VERSION -O netperf-$VERSION.zip
 unzip netperf-$VERSION.zip
 mv netperf-netperf-$VERSION netperf-$VERSION
 cd netperf-$VERSION
