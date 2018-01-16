@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-if [ ! -e jython.jar ];then
-	wget -c http://search.maven.org/remotecontent?filepath=org/python/jython-standalone/2.7.0/jython-standalone-2.7.0.jar -O jython.jar
-fi
+wget -c http://search.maven.org/remotecontent?filepath=org/python/jython-standalone/2.7.0/jython-standalone-2.7.0.jar -O jython.jar
 
 exit 0
