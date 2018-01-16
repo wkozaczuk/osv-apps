@@ -2,6 +2,5 @@
 set -e
 VERSION=3.10.0
 
-wget -nc http://download.newrelic.com/newrelic/java-agent/newrelic-agent/$VERSION/newrelic-agent-$VERSION.jar
-wget -nc http://download.newrelic.com/newrelic/java-agent/newrelic-agent/$VERSION/newrelic.yml
-cp newrelic-agent-$VERSION.jar newrelic.jar
+wget -c http://download.newrelic.com/newrelic/java-agent/newrelic-agent/$VERSION/newrelic-agent-$VERSION.jar -O newrelic.jar
+wget -c http://download.newrelic.com/newrelic/java-agent/newrelic-agent/$VERSION/newrelic.yml
