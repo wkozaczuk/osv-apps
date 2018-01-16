@@ -26,11 +26,11 @@ upstream:
 	mkdir -p $@
 
 $(tarball): upstream
-	cd upstream && wget -nc http://archive.apache.org/dist/cassandra/$(VERSION)/$(tarball_name)
+	cd upstream && wget -c http://archive.apache.org/dist/cassandra/$(VERSION)/$(tarball_name)
 	touch $@
 
 $(jna): upstream
-	cd upstream && wget -nc https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/$(jna_version)/jna-$(jna_version).jar
+	cd upstream && wget -c https://maven.java.net/content/repositories/releases/net/java/dev/jna/jna/$(jna_version)/jna-$(jna_version).jar
 	touch $@
 
 clean:
