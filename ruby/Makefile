@@ -28,7 +28,7 @@ upstream/ruby:
 
 upstream/obstack-1.2.tar.bz2:
 	mkdir -p upstream
-	cd upstream && wget -O obstack-1.2.tar.bz2 "http://sourceforge.jp/frs/g_redir.php?m=jaist&f=%2Flibfirm%2Fobstack%2F1.2%2Fobstack-1.2.tar.bz2"
+	cd upstream && wget -c -O obstack-1.2.tar.bz2 "http://sourceforge.jp/frs/g_redir.php?m=jaist&f=%2Flibfirm%2Fobstack%2F1.2%2Fobstack-1.2.tar.bz2"
 	cd upstream && tar xvf obstack-1.2.tar.bz2
 	cd upstream/obstack-1.2/ && patch -p1 < ../../obstack_vprintf.patch
 	cd upstream/obstack-1.2/ && ./configure
@@ -39,7 +39,7 @@ upstream/bundler:
 
 upstream/cert.pem:
 	mkdir -p upstream
-	cd upstream && wget -O cert.pem "http://curl.haxx.se/ca/cacert.pem"
+	cd upstream && wget -c -O cert.pem "http://curl.haxx.se/ca/cacert.pem"
 
 ${LIBOBSTACK_A}: upstream/obstack-1.2.tar.bz2
 	cd upstream/obstack-1.2/ && make
