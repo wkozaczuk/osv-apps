@@ -3,7 +3,7 @@
 VER=osv-v1
 
 if [ ! -e servlet.war ];then
-    wget https://github.com/cloudius-systems/FrameworkBenchmarks/releases/download/${VER}/servlet.war
+    wget -c https://github.com/cloudius-systems/FrameworkBenchmarks/releases/download/${VER}/servlet.war
 fi
 mkdir -p ROOTFS/usr/tomcat/webapps/
 zip servlet.war META-INF/context.xml
