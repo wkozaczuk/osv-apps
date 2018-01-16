@@ -5,7 +5,7 @@ VERSION=3080200
 
 mkdir upstream
 cd upstream
-wget http://www.sqlite.org/$YEAR/sqlite-amalgamation-$VERSION.zip
+wget -c http://www.sqlite.org/$YEAR/sqlite-amalgamation-$VERSION.zip
 unzip -x sqlite-amalgamation-$VERSION.zip
 cd -
 
