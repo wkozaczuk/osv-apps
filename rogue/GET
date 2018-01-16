@@ -9,8 +9,7 @@ unset MFLAGS
 unset MAKE
 
 # Get and compile ncurses
-
-wget http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz
+wget -c http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz
 tar zxvf ncurses-5.9.tar.gz
 cd ncurses-5.9
 patch -p2 < ../../ncurses.patch
@@ -27,7 +26,7 @@ cd ..
 #wget http://rogue.rogueforge.net/files/rogue5.4/rogue5.4.4-src.tar.gz
 #tar zxvf rogue5.4.4-src.tar.gz
 #cd rogue5.4.4
-wget https://github.com/phs/rogue/archive/master.tar.gz
+wget -c https://github.com/phs/rogue/archive/master.tar.gz
 tar zxvf master.tar.gz
 cd rogue-master
 CFLAGS="-fPIC -O2" ./configure --prefix=/usr 
