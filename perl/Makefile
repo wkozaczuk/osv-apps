@@ -39,7 +39,7 @@ perl/makefile: $(PERLSRC_DIST)
 	cd perl && ./Configure $(CONFIGURE_FLAGS)
 
 $(PERLSRC_DIST):
-	wget $(WGET_URL)
+	wget -c $(WGET_URL)
 
 #configure only (make clean configure):
 configure:  perl/makefile
