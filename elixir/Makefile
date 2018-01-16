@@ -6,7 +6,7 @@ all: install
 module: install
 
 elixir-$(ELIXIR_VERSION).tar.gz:
-	wget -O "$@.temp" "https://github.com/elixir-lang/elixir/archive/v$(ELIXIR_VERSION).tar.gz"
+	wget -c -O "$@.temp" "https://github.com/elixir-lang/elixir/archive/v$(ELIXIR_VERSION).tar.gz"
 	mv "$@.temp" "$@"
 
 elixir-$(ELIXIR_VERSION): elixir-$(ELIXIR_VERSION).tar.gz
