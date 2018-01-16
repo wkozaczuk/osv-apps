@@ -25,7 +25,7 @@ clean:
 # "in the past", like wget and tar, and can confuse Make to rebuild a target
 # which is new, just pretends to be old.
 upstream.tar:
-	wget -O $@ $(SOURCE)
+	wget -c -O $@ $(SOURCE)
 	touch $@
 
 upstream/lighttpd/Makefile.in: upstream.tar
