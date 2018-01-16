@@ -7,7 +7,7 @@ all: install erlang.so
 module: install erlang.so
 
 otp_src_$(OTP_VERSION).tar.gz:
-	wget -O "$@.temp" "http://www.erlang.org/download/otp_src_$(OTP_VERSION).tar.gz"
+	wget -c -O "$@.temp" "http://www.erlang.org/download/otp_src_$(OTP_VERSION).tar.gz"
 	mv "$@.temp" "$@"
 
 otp_src_$(OTP_VERSION): otp_src_$(OTP_VERSION).tar.gz
