@@ -8,7 +8,7 @@ URL:=http://downloads.onosproject.org/release/$(TARBALL)
 module: ROOTFS usr.manifest
 
 $(TARBALL):
-	wget $(URL)
+	wget -c $(URL)
 
 ROOTFS/$(NAME): $(TARBALL)
 	tar xf $(TARBALL)
