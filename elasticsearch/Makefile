@@ -7,7 +7,7 @@ URL:=https://download.elastic.co/elasticsearch/release/org/elasticsearch/distrib
 module: ROOTFS usr.manifest
 
 $(TARBALL):
-	wget $(URL)
+	wget -c $(URL)
 
 ROOTFS/$(NAME): $(TARBALL)
 	tar xvf $(TARBALL)
