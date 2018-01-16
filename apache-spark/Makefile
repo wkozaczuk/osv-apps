@@ -9,7 +9,7 @@ URL:=http://d3kbcqa49mib13.cloudfront.net/$(TARBALL)
 module: ROOTFS usr.manifest
 
 $(TARBALL):
-	wget $(URL)
+	wget -c $(URL)
 
 ROOTFS/$(NAME): $(TARBALL)
 	tar xvf $(TARBALL)
