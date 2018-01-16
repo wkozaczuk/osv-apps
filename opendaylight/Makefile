@@ -7,7 +7,7 @@ URL		:= https://nexus.opendaylight.org/content/groups/public/org/opendaylight/in
 module: ROOTFS usr.manifest
 
 $(TARBALL):
-	wget $(URL)
+	wget -c $(URL)
 
 ROOTFS/$(NAME): $(TARBALL)
 	tar xvf $(TARBALL)
