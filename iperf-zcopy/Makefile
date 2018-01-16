@@ -25,7 +25,7 @@ $(iperfv)/src/iperf: $(tarball)
 	+$(MAKE) -C $(iperfv)
 
 $(tarball):
-	wget -O $@ $(url)
+	wget -c -O $@ $(url)
 
 clean:
 	rm -rf $(tarball) $(iperfv) iperf
