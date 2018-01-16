@@ -9,7 +9,7 @@ install: ROOTFS/cado
 
 $(CADOSRC_DIST):
 	@echo CADO_VERS=$(CADO_VERS) CADOSRC_DIST=$(CADOSRC_DIST)
-	wget $(WGET_URL)
+	wget -c $(WGET_URL)
 
 ROOTFS/cado: $(CADOSRC_DIST)
 	mkdir -p ROOTFS
