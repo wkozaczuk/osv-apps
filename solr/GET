@@ -5,9 +5,7 @@ VERSION=4.8.1
 SRC_DIR=solr-$VERSION
 TARBALL=$SRC_DIR.tgz
 
-if [ ! -e $TARBALL ];then
-    wget -c http://archive.apache.org/dist/lucene/solr/$VERSION/$TARBALL
-fi
+wget -c http://archive.apache.org/dist/lucene/solr/$VERSION/$TARBALL
 rm -rf $SRC_DIR ROOTFS
 tar zxf $TARBALL
 
