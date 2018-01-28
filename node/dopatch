@@ -22,3 +22,5 @@ ed -s common.gypi << EOF
 ,s/'cflags':.*'-pthread'/&, '-fPIC'/
 w
 EOF
+
+patch -p1 <../gcc7.patch
