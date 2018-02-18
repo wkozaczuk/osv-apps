@@ -1,5 +1,5 @@
 .PHONY: module version_check test clean
-module: version_check ruby.so usr.manifest
+module: usr.manifest
 
 CFLAGS=-fPIC -Wall -shared
 
@@ -17,7 +17,7 @@ LIBOBSTACK_A=upstream/obstack-1.2/.libs/libobstack.a
 version_check:
 	@test 1 -eq `ruby --version|grep -e "^ruby ${RUBY_VER}"|wc -l` || (echo "Please install ruby ${RUBY_VER}." && exit 1)
 
-upstream/ruby:
+upstream/ruby: version_check
 	mkdir -p upstream
 	cd upstream && git clone --depth 1 -b v$(subst .,_,${RUBY_VER}) https://github.com/ruby/ruby.git
 	cd upstream/ruby && patch -p1 < ../../no-use-sleepy-thread-timer-ruby.patch
