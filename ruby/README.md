@@ -13,14 +13,14 @@ Example:
 \curl -sSL https://get.rvm.io | bash -s stable
 source ~/.profile
 
-rvm install ruby-2.2.2
+rvm install ruby-2.2.4
 ```
 
 ## Try irb on OSv
 
 You can try irb by following command:
 ```
-./scripts/run.py -e '/ruby.so /irb'
+./scripts/run.py -e '--env=RUBYLIB=/usr/share/ruby:/usr/lib64/ruby /ruby.so /irb'
 ```
 
 ## Sample scripts
