@@ -9,7 +9,7 @@ from osv.modules.filemap import FileMap
 from osv.modules import api
 
 api.require('java-non-isolated')
-provides = ['java']
+provides = ['java','java8']
 
 usr_files = FileMap()
 usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact1/install').to('/').allow_symlink()
