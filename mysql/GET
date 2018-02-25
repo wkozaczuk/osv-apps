@@ -40,9 +40,9 @@ $(cat CMakeFiles/mysqld.dir/link.txt) -shared
 cd $BASEDIR
 
 echo "
-/etc/**:${ROOTDIR}/etc/**
-/usr/share/**:${ROOTDIR}/usr/share/**
-/usr/lib/**:${ROOTDIR}/usr/lib/**
-/usr/data/**:${ROOTDIR}/usr/data/**
-/usr/bin/mysqld:${BUILDDIR}/sql/mysqld
+/etc/**: ${ROOTDIR}/etc/**
+/usr/share/**: ${ROOTDIR}/usr/share/**
+/usr/lib/**: ${ROOTDIR}/usr/lib/**
+/usr/data/**: ${ROOTDIR}/usr/data/**
+/usr/bin/mysqld: ${BUILDDIR}/sql/mysqld
 " > usr.manifest
