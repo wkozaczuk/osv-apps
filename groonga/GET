@@ -24,8 +24,8 @@ cd $BASEDIR
 find . -name "*.so" |  xargs -I {} ldd {} | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|dl|m|util|rt|pthread|z|groonga.*).so' | xargs -I {} install  {} install/lib
 
 echo "
-/usr/etc/**:${ROOTDIR}/etc/**
-/usr/share/**:${ROOTDIR}/share/**
-/usr/lib/**:${ROOTDIR}/lib/**
-/usr/bin/groonga:${ROOTDIR}/bin/groonga
+/usr/etc/**: ${ROOTDIR}/etc/**
+/usr/share/**: ${ROOTDIR}/share/**
+/usr/lib/**: ${ROOTDIR}/lib/**
+/usr/bin/groonga: ${ROOTDIR}/bin/groonga
 " > usr.manifest
