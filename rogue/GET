@@ -41,5 +41,5 @@ cd ..
 # Build a fixed terminfo, which doesn't use linefeed to go down, but rather
 # uses the down escape sequence - because Qemu screws up ^J and replaces it
 # with ^J^M...
-infocmp xterm | sed 's/cud1=^J,/cud1=\\E[B,/; s/ind=^J,/ind=\\E[S,/; s/xterm/unknown/' >terminfo.tmp
+infocmp xterm | sed 's/cud1=\(^J\|\\n\),/cud1=\\E[B,/; s/ind=\(^J\|\\n\),/ind=\\E[S,/; s/xterm/unknown/' >terminfo.tmp
 ncurses-5.9/progs/tic -o fixed-terminfo terminfo.tmp
