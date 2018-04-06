@@ -13,7 +13,7 @@ api.require('httpserver-api')
 
 # httpserver will run regardless of an explicit command line
 # passed with "run.py -e".
-_exe = '/libhttpserver.so'
+_exe = '/libhttpserver-api.so'
 daemon = api.run_on_init(_exe + ' &!')
 
 fg = api.run(_exe)
