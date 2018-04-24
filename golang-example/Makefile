@@ -1,9 +1,9 @@
 .PHONY: module
-module: hello
-	echo '/hello: $${MODULE_DIR}/hello' > usr.manifest
+module: hello.so
+	echo '/hello.so: $${MODULE_DIR}/hello.so' > usr.manifest
 
-hello: hello.go
-	go build -buildmode=c-shared hello.go
+hello.so: hello.go
+	go build -buildmode=c-shared -o hello.so hello.go
 
 clean:
-	rm -f hello usr.manifest
+	rm -f hello*.so hello.h usr.manifest
