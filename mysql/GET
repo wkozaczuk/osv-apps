@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VERSION=5.6.21
+VERSION=5.6.40
 BASEDIR=$PWD
 BUILDDIR=$BASEDIR/build
 ROOTDIR=$BASEDIR/install
@@ -19,7 +19,7 @@ cd $SRCDIR
 patch -p1 < ../osv.patch
 
 cd $BUILDDIR
-CFLAGS="-fPIC" CXXFLAGS="-fPIC" cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr ../mysql-$VERSION
+CFLAGS="-fPIC" CXXFLAGS="-fPIC" cmake -DWITH_NUMA=OFF -DCMAKE_INSTALL_PREFIX:PATH=/usr ../mysql-$VERSION
 make -j4
 make install DESTDIR=$ROOTDIR
 

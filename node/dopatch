@@ -15,12 +15,24 @@ cd "node-$1"
 ed -s node.gyp << EOF
 ,s/\(['"]\)executable\1/\1shared_library\1/
 g/'-Wl,--whole-archive/d
+g/'<(node_core_target_name)<(STATIC_LIB_SUFFIX)',/d
 w
 EOF
+
+ed -s node.gypi << EOF
+,g/'-Wl,--whole-archive/d
+w
+EOF
+
 
 ed -s common.gypi << EOF
 ,s/'cflags':.*'-pthread'/&, '-fPIC'/
 w
 EOF
 
-patch -p1 <../gcc7.patch
+ed -s tools/gyp/pylib/gyp/generator/make.py << EOF
+,s/-Wl,--whole-archive//g
+w
+EOF
+
+#patch -p1 <../gcc7.patch
