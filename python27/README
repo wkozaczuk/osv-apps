@@ -1,8 +1,0 @@
-This app builds an image containing the already-compiled Python shared
-object (libpython2.7.so) installed on the build macine, and some of
-the required libraries from the build machine.
-
-Example usage:
-
-./scripts/run.py -e "/python"
-./scripts/run.py -e "/python -c \"aa={1:22,3:44}; print aa; print 'asdf'\""

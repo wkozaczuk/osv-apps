@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=2.7
 BASEDIR=$PWD
 ROOTFS=$BASEDIR/ROOTFS
+
+PYTHON_PREFIX_DIR=`python -c 'import sys; print(sys.prefix)'`
+PYTHON_MAJOR_VERSION=`python -c 'import sys; print(sys.version_info.major)'`
+PYTHON_MINOR_VERSION=`python -c 'import sys; print(sys.version_info.minor)'`
+PYTHON_VERSION="${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
 
 install_shlibs() {
 SHLIBS=""
@@ -17,23 +21,22 @@ SHLIBS_COUNT="`echo \"$SHLIBS\" | wc -l`"
 ldd $SHLIBS | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|gcc|dl|m|util|rt|pthread|stdc\+\+|selinux|krb5|gssapi_krb5)\.so' | xargs -I {} install  {} $ROOTFS/usr/lib
 # ROOTFS/lib/python2.7/config/libpython2.7.so is a symlink to ../../libpython2.7.so,
 # so create a valid destination to avoid ldd error due to dangling symlink.
-(cd $ROOTFS/lib && ln -sf ../usr/lib/libpython$VERSION.so.1.0 libpython$VERSION.so)
+(cd $ROOTFS/lib && ln -sf ../usr/lib/libpython${PYTHON_VERSION}.so.1.0 libpython${PYTHON_VERSION}.so)
 echo "$SHLIBS_COUNT"
 }
 
 main() {
 mkdir -p build/
-gcc -o build/python.so python.c -fPIC -shared -lpython${VERSION}
+gcc -o build/python.so python.c -fPIC -shared -lpython${PYTHON_VERSION}
 
 rm -rf "$ROOTFS"
 mkdir -p "$ROOTFS/usr/lib"
-mkdir -p "$ROOTFS/lib/python$VERSION"
+mkdir -p "$ROOTFS/lib/python${PYTHON_VERSION}"
 
 cp build/python.so "$ROOTFS"
 install_shlibs
-# TODO /lib64/python2.7/ should not be hardcoded?
-PY_LIB1=/lib64/python$VERSION/
-rsync -a $PY_LIB1 $ROOTFS/lib/python$VERSION/ --exclude test --exclude unittest \
+PY_LIB1="${PYTHON_PREFIX_DIR}/lib/python${PYTHON_VERSION}/"
+rsync -a $PY_LIB1 $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
 
 SHLIBS_COUNT4=`install_shlibs`
