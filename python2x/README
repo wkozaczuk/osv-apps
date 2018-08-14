@@ -1,0 +1,13 @@
+This app builds an image containing the already-compiled Python shared
+object for Python 2.x (libpython2.7.so for example) installed on the build macine,
+and some of the required libraries from the build machine.
+
+The python home directory is assumed to be installed under
+<sys.prefix>/lib/python<sys.version_info.major>.<sys.version_info.minor>/
+where sys is Python package this script reads the sys.* values from.
+
+Example usage:
+
+./scripts/run.py -e "/python"
+./scripts/run.py -e "/python -c \"aa={1:22,3:44}; print aa; print 'asdf'\""
+./scripts/run.py --api -e "/python -m SimpleHTTPServer 8000"
