@@ -35,9 +35,11 @@ mkdir -p "$ROOTFS/lib/python${PYTHON_VERSION}"
 
 cp build/python.so "$ROOTFS"
 install_shlibs
-PY_LIB1="${PYTHON_PREFIX_DIR}/lib/python${PYTHON_VERSION}/"
-rsync -a $PY_LIB1 $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
+for dir in ${PYTHON_PREFIX_DIR}/lib*/python${PYTHON_VERSION}/
+do
+    rsync -a "$dir" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
+done
 
 SHLIBS_COUNT4=`install_shlibs`
 echo "Python SHLIBS_COUNT4=$SHLIBS_COUNT4"
