@@ -2,6 +2,11 @@ This app builds an image containing the already-compiled Python shared
 object for Python 2.x (libpython2.7.so for example) installed on the build macine,
 and some of the required libraries from the build machine.
 
+In order to build this app you need to have Python development package
+installed for your distribution. Examples how to do it:
+sudo apt-get install python-dev # On Ubuntu
+sudo dnf install python-devel   # On Fedora
+
 The python home directory is assumed to be installed under
 <sys.prefix>/lib/python<sys.version_info.major>.<sys.version_info.minor>/
 where sys is Python package this script reads the sys.* values from.
