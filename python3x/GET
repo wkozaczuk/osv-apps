@@ -38,7 +38,7 @@ install_shlibs
 for dir in ${PYTHON_PREFIX_DIR}/lib*/python${PYTHON_VERSION}/
 do
     rsync -a "$dir" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
-    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
+    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages'
 done
 
 SHLIBS_COUNT4=`install_shlibs`
