@@ -12,7 +12,7 @@ api.require('java-non-isolated')
 provides = ['java','java8','java9','java10']
 
 usr_files = FileMap()
-usr_files.add('${OSV_BASE}/apps/openjdk10-java-base/install').to('/').allow_symlink()
-usr_files.add('${OSV_BASE}/apps/openjdk10-java-base/install/usr/lib/jvm/java') \
+usr_files.add('${OSV_BASE}/apps/openjdk10-zulu-java-base/install').to('/').allow_symlink()
+usr_files.add('${OSV_BASE}/apps/openjdk10-zulu-java-base/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
