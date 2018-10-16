@@ -156,7 +156,7 @@ class FileService(endpoint: InetSocketAddress) extends Actor with ActorLogging {
 object FileServiceApp extends App {
 
   val system = ActorSystem("file-service-system")
-  val endpoint = new InetSocketAddress("localhost", 1055)
+  val endpoint = new InetSocketAddress("0.0.0.0", 1055)
   system.actorOf(FileService.props(endpoint), "file-service")
 
   StdIn.readLine("Hit ENTER to exit ...\n")
