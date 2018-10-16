@@ -2,8 +2,8 @@
 module: mono_exec
 
 #CFLAGS = -std=gnu99 -fpie -rdynamic
-CFLAGS=`pkg-config --cflags mono-2`
-LDFLAGS=`pkg-config --libs mono-2`
+CFLAGS=-std=gnu99 -fpie -rdynamic `pkg-config --cflags mono-2`
+LDFLAGS=-pie `pkg-config --libs mono-2`
 
 mono_exec: mono_exec.c
 	$(CC) -o $@ $(CFLAGS) mono_exec.c $(LDFLAGS)

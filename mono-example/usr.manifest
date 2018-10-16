@@ -1,0 +1,4 @@
+/libmonosgen-2.0.so.1: ${MODULE_DIR}/libmonosgen-2.0.so.1
+/hello.exe: ${MODULE_DIR}/hello.exe
+/mono_exec: ${MODULE_DIR}/mono_exec
+/usr/lib/mono/4.5/mscorlib.dll: /usr/lib/mono/4.5/mscorlib.dll
