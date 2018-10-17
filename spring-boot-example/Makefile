@@ -16,4 +16,4 @@ spring-boot-examples/.git:
 	cd $(app-dir) && git clone --depth 1 https://github.com/in28minutes/spring-boot-examples.git
 
 clean:
-	cd $(app-dir) && rm -rf spring-boot-examples && rm -f usr.manifest
+	cd $(app-dir) && rm -rf spring-boot-examples usr.manifest

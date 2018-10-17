@@ -7,12 +7,10 @@
 
 .PHONY: module
 
-module: akka-example.jar
+module: target/akka-example-1.0-SNAPSHOT-jar-with-dependencies.jar
 
-akka-example.jar: src/main/scala/demo/FileService.scala
+target/akka-example-1.0-SNAPSHOT-jar-with-dependencies.jar: src/main/scala/demo/FileService.scala
 	mvn package
-	cp target/akka-example-1.0-SNAPSHOT-jar-with-dependencies.jar akka-example.jar
 
 clean:
 	mvn clean
-	rm akka-example.jar
