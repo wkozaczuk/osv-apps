@@ -17,4 +17,4 @@ upstream/graalvm-ce-1.0.0-rc7:
 	cd upstream && tar xf graalvm.tar.gz
 
 clean:
-	rm -f *.class libhello* main*.so graal*.h upstream
+	rm -rf *.class libhello* main*.so graal*.h upstream
