@@ -1,0 +1,11 @@
+--- upstream/ffmpeg-4.0.2/fftools/Makefile	2018-07-18 09:51:59.000000000 -0400
++++ ffmpeg/ffmpeg-4.0.2/fftools/Makefile	2018-10-12 16:16:44.415952735 -0400
+@@ -4,6 +4,8 @@
+ 
+ AVPROGS     := $(AVPROGS-yes:%=%$(PROGSSUF)$(EXESUF))
+ PROGS       += $(AVPROGS)
++CFLAGS  += $(CFLAGS-$(1)) -fpie -rdynamic
++LDFLAGS += $(LDFLAGS) -pie
+ 
+ AVBASENAMES  = ffmpeg ffplay ffprobe
+ ALLAVPROGS   = $(AVBASENAMES:%=%$(PROGSSUF)$(EXESUF))
