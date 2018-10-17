@@ -1,0 +1,27 @@
+--- pom.xml	2018-10-16 21:58:47.000000000 -0400
++++ pom.xml.patched	2018-10-16 22:01:01.000000000 -0400
+@@ -80,10 +80,24 @@
+         <resources>
+             <resource>
+                 <directory>src/main/resources</directory>
+             </resource>
+         </resources>
++       <plugins>
++         <plugin>
++           <groupId>org.springframework.boot</groupId>
++           <artifactId>spring-boot-maven-plugin</artifactId>
++           <version>2.0.5.RELEASE</version>
++           <executions>
++             <execution>
++               <goals>
++                 <goal>repackage</goal>
++               </goals>
++             </execution>
++           </executions>
++         </plugin>
++       </plugins>
+     </build>
+ 
+     <properties>
+         <maven.compiler.source>1.8</maven.compiler.source>
+         <maven.compiler.target>1.8</maven.compiler.target>
