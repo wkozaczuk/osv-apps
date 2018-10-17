@@ -23,6 +23,7 @@ public class HttpServerApp {
         final HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         server.createContext("/", handler);
         server.setExecutor(null); // creates a default executor
+        System.out.println("Listening on port 8000 ...");
         server.start(); 
     }
 }
