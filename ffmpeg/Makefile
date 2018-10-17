@@ -16,7 +16,7 @@ ${SRCDIR}/ffmpeg-${VERSION}:
 	wget -c -O upstream/${TARBALL} ${DOWNLOAD_URL}/${TARBALL}
 	cd upstream && tar xf ${TARBALL}
 
-${SRCDIR}/ffmpeg-${VERSION}/ffmpeg: ${SRCDIR}/ffmpeg-${VERSION}/fftools/ffmpeg.c
+${SRCDIR}/ffmpeg-${VERSION}/ffmpeg: ${SRCDIR}/ffmpeg-${VERSION}
 	cd ${SRCDIR}/ffmpeg-${VERSION} && ./configure --disable-static --enable-shared --disable-ffplay --disable-ffprobe
 	cd ${SRCDIR}/ffmpeg-${VERSION} && make
 	cd ${SRCDIR}/ffmpeg-${VERSION} && rm ffmpeg ffmpeg_g fftools/*.o fftools/*.d
