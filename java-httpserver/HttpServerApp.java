@@ -1,3 +1,9 @@
+//
+// Copyright (C) 2018 Waldek Kozaczuk
+//
+// This work is open source software, licensed under the terms of the
+// BSD license as described in the LICENSE file in the top-level directory.
+//
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
