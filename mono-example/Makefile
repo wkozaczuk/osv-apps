@@ -1,13 +1,17 @@
 .PHONY: module
-module: mono_exec
+module: ROOTFS/run_mono ROOTFS/hello.exe
 
-#CFLAGS = -std=gnu99 -fpie -rdynamic
 CFLAGS=-std=gnu99 -fpie -rdynamic `pkg-config --cflags mono-2`
 LDFLAGS=-pie `pkg-config --libs mono-2`
 
-mono_exec: mono_exec.c
-	$(CC) -o $@ $(CFLAGS) mono_exec.c $(LDFLAGS)
-	#$(CC) -pie -o $@ $(CFLAGS) $(LDFLAGS) mono_exec.c
+ROOTFS/run_mono: run_mono.c
+	mkdir -p ROOTFS
+	pkg-config --exists mono-2 || echo "Please install mono2. For details read https://www.mono-project.com/download/stable/#download-lin"
+	$(CC) -o $@ $(CFLAGS) run_mono.c $(LDFLAGS)
+
+ROOTFS/hello.exe: hello.cs
+	mkdir -p ROOTFS
+	csc hello.cs /out:ROOTFS/hello.exe
 
 clean:
-	rm -f mono_exec
+	rm -rf ROOTFS
