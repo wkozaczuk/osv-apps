@@ -160,6 +160,7 @@ object FileServiceApp extends App {
   val endpoint = new InetSocketAddress("0.0.0.0", 1055)
   system.actorOf(FileService.props(endpoint), "file-service")
 
+  println("Listening on TCP port 1055 -> telnet to it")
   StdIn.readLine("Hit ENTER to exit ...\n")
   system.terminate()
 }
