@@ -1,3 +1,9 @@
+//
+// Copyright (C) 2018 Waldek Kozaczuk
+//
+// This work is open source software, licensed under the terms of the
+// BSD license as described in the LICENSE file in the top-level directory.
+//
 package demo
 
 import java.io.File
@@ -11,9 +17,6 @@ import akka.util.ByteString
 
 import scala.io.{Source, StdIn}
 
-/**
-  * Created by wkozaczuk on 10/16/18.
-  */
 // http://doc.akka.io/docs/akka/snapshot/scala/io.html
 // http://doc.akka.io/docs/akka/snapshot/dev/io-layer.html#io-layer
 
@@ -28,8 +31,6 @@ import scala.io.{Source, StdIn}
 // Connect command sent to the TCP manager the manager creates an actor representing the TCP connection.
 // All operations related to the given TCP connections can be invoked by sending messages to the connection
 // actor which announces itself by sending a Connected message."
-
-// ByteString
 
 // "The manager actor creates (and therefore supervises) the selector actors, which in turn create and
 // supervise their channel actors. The actor hierarchy of one single transport implementation therefore

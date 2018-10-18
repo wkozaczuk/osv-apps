@@ -44,8 +44,8 @@
 	<artifactId>maven-assembly-plugin</artifactId>
 	<configuration>
 		<descriptorRefs>
-        	<descriptorRef>jar-with-dependencies</descriptorRef>
-        </descriptorRefs>
+			<descriptorRef>jar-with-dependencies</descriptorRef>
+        	</descriptorRefs>
 		<archive>
 			<manifest>
 				<mainClass>demo.FileServiceApp</mainClass>
