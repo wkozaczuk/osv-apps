@@ -23,7 +23,7 @@ module:
 	wget -c -O upstream/$(java_fullname) $(download_url)
 	cd upstream && tar xfz $(java_fullname)
 	rm -rf install && mkdir install
-	cd install && ../upstream/$(java_version)/bin/jlink --module-path ../upstream/$(java_version)/jmods --add-modules java.base --output $(linked_jre_dir) --strip-debug --compress=2
+	cd install && ../upstream/$(java_version)/bin/jlink --module-path ../upstream/$(java_version)/jmods --add-modules java.base,jdk.unsupported --output $(linked_jre_dir) --strip-debug --compress=2
 	cd install && rm -rf $(linked_jre_dir)/bin
 	ln -sf $(jre_name) $(jvm_dir)/java
 	rm -rf $(jvm_dir)/java/lib/security/cacerts
