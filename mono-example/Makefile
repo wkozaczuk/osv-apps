@@ -1,5 +1,5 @@
 .PHONY: module
-module: ROOTFS/run_mono ROOTFS/hello.exe
+module: usr.manifest
 
 CFLAGS=-std=gnu99 -fpie -rdynamic `pkg-config --cflags mono-2`
 LDFLAGS=-pie `pkg-config --libs mono-2`
@@ -13,5 +13,10 @@ ROOTFS/hello.exe: hello.cs
 	mkdir -p ROOTFS
 	csc hello.cs /out:ROOTFS/hello.exe
 
+usr.manifest: ROOTFS/run_mono ROOTFS/hello.exe
+	echo '/**: $${MODULE_DIR}/ROOTFS/**' > usr.manifest
+	echo "/usr/lib/mono/4.5/mscorlib.dll: /usr/lib/mono/4.5/mscorlib.dll" >> usr.manifest
+	echo "/libmonosgen-2.0.so.1: `ldd ROOTFS/run_mono | grep -o "/.*libmonosgen-2.0.so.1"`" >> usr.manifest
+
 clean:
-	rm -rf ROOTFS
+	rm -rf ROOTFS usr.manifest
