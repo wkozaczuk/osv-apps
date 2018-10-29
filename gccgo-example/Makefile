@@ -6,7 +6,7 @@ module: hello.so
 		>> usr.manifest
 
 CFLAGS = -g -fPIC
-LDFLAGS = -lgo
+LDFLAGS = -lgo -lgobegin
 
 %.o: %.go
 	gccgo -c $(CFLAGS) -o $@ $<
@@ -18,5 +18,5 @@ clean:
 	rm -f hello.so *.o hello usr.manifest
 
 # Test pie (works on Linux, but not yet on OSv)
-hello: hello.o go-main.o
+hello: hello.o
 	$(CC) -pie -o $@ $^ $(LDFLAGS)
