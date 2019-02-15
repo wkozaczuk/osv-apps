@@ -8,6 +8,8 @@ PYTHON_PREFIX_DIR=`python3 -c 'import sys; print(sys.prefix)'`
 PYTHON_MAJOR_VERSION=`python3 -c 'import sys; print(sys.version_info.major)'`
 PYTHON_MINOR_VERSION=`python3 -c 'import sys; print(sys.version_info.minor)'`
 PYTHON_VERSION="${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
+PYTHON_MODULES="" #put additional modules here. Include their dependencies. Example: "django mysql mysql.connector"
+
 
 install_shlibs() {
 SHLIBS=""
@@ -39,6 +41,13 @@ for dir in ${PYTHON_PREFIX_DIR}/lib*/python${PYTHON_VERSION}/
 do
     rsync -a "$dir" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages'
+done
+
+for i in ${PYTHON_MODULES}
+do
+    rsync -a "$(python3 -c "import sys; module = sys.argv[1]; exec('import ' + module); print(eval(module + '.__file__')) if str(eval(module + '.__file__').split('/')[-1]) != '__init__.py' else print(eval(module + '.__path__[0]'))" $i)" \
+    $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
+    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
 done
 
 SHLIBS_COUNT4=`install_shlibs`
