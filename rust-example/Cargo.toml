@@ -7,4 +7,4 @@ authors = ["Waldemar Kozaczuk <jwkozaczuk@gmail.com>"]
 rustc_version_runtime = "0.1.*"
 
 [lib]
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
