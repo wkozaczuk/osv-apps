@@ -27,44 +27,31 @@ ldd $SHLIBS | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|gcc|dl|m|
 echo "$SHLIBS_COUNT"
 }
 
-get_dependencies() {
-python3 - <<'EOF' $1
+get_paths() {
+python3 - <<'EOF' "$1"
 import sys
 
-#get a dict of modules imported at the start
-default_modules = sys.modules.copy()
+unique_paths = set([])
 
 #import all additional modules
-for mod in sys.argv[1].split(" "):
-  exec('import ' + mod)
+for mod in sys.argv[1].split():
+  try:
+    exec('import ' + mod)
+    if str(eval(mod + '.__file__')[-12:]) != '/__init__.py':
+      unique_paths.add(eval(mod + '.__file__'))
+    else:
+      unique_paths.add(eval(mod + '.__path__[0]'))
 
-unique_paths = set()
-
-def path_exploration(l_modules):
-  for mo in l_modules:
-    exec('import ' + mo)
-#for submodules(x.y), copy the top level module(x)
-    l_mod = mo.split('.')[0]
-
-#real modules have file. Some modules have __path__, and their file is __init__.py
-    try:
-      if str(eval(l_mod + '.__file__').split('/')[-1]) != '__init__.py':
-        if eval(l_mod + '.__file__')[-3:] not in ['.so', 'in>']:  #skip .so and <stdin>
-          unique_paths.add(eval(l_mod + '.__file__') + ' ')
-      else:
-        unique_paths.add(str(eval(l_mod + '.__path__[0]')) + '/ ')
-    except NameError:  #module not imported. Try to import
-      path_exploration(set(l_mod))
-    except AttributeError:
-      pass  #built-in modules don't have __file__
-
-modules = set(sys.modules.keys()).difference(set(default_modules.keys()))
-path_exploration(modules)
+  except NameError:  #module not imported. Try to import
+    raise Exception("You misspelled the module name")
+  except AttributeError:
+    pass  #built-in modules don't have __file__
 
 print(" ".join(unique_paths))
 
 EOF
 }
+
 
 main() {
 mkdir -p build/
@@ -82,7 +69,7 @@ do
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages'
 done
 
-for i in $(get_dependencies "${PYTHON_MODULES}")
+for i in $(get_paths "${PYTHON_MODULES}")
 do
     rsync -a "$i" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links \
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
