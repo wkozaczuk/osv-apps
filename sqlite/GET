@@ -9,4 +9,4 @@ wget -c http://www.sqlite.org/$YEAR/sqlite-amalgamation-$VERSION.zip
 unzip -x sqlite-amalgamation-$VERSION.zip
 cd -
 
-cc -O2 -fPIC -Wall -shared -DHAVE_MREMAP=0 -o sqlite.so upstream/sqlite-amalgamation-$VERSION/*.c
+cc -O2 -fPIC -Wall -shared -DHAVE_MREMAP=0 -o libsqlite3.so.0 upstream/sqlite-amalgamation-$VERSION/*.c
