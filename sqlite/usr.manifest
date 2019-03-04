@@ -1,1 +1,1 @@
-/tools/sqlite.so: ${MODULE_DIR}/sqlite.so
+/usr/lib/libsqlite3.so.0: ${MODULE_DIR}/libsqlite3.so.0
