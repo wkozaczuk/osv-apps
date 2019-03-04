@@ -55,6 +55,9 @@ then
 	echo "ERROR some libraries required by python might be missing"
 	exit 1
 fi
+
+#replace sqlite with a non-MREMAP version
+rsync -a $BASEDIR/../sqlite/libsqlite3.so.0 $ROOTFS/usr/lib/libsqlite3.so.0
 }
 
 main
