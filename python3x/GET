@@ -8,6 +8,8 @@ PYTHON_PREFIX_DIR=`python3 -c 'import sys; print(sys.prefix)'`
 PYTHON_MAJOR_VERSION=`python3 -c 'import sys; print(sys.version_info.major)'`
 PYTHON_MINOR_VERSION=`python3 -c 'import sys; print(sys.version_info.minor)'`
 PYTHON_VERSION="${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
+PYTHON_MODULES="" #put additional modules here. Example: "django mysql mysql.connector"
+
 
 install_shlibs() {
 SHLIBS=""
@@ -25,6 +27,32 @@ ldd $SHLIBS | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|gcc|dl|m|
 echo "$SHLIBS_COUNT"
 }
 
+get_paths() {
+python3 - <<'EOF' "$1"
+import sys
+
+unique_paths = set([])
+
+#import all additional modules
+for mod in sys.argv[1].split():
+  try:
+    exec('import ' + mod)
+    if str(eval(mod + '.__file__')[-12:]) != '/__init__.py':
+      unique_paths.add(eval(mod + '.__file__'))
+    else:
+      unique_paths.add(eval(mod + '.__path__[0]'))
+
+  except NameError:  #module not imported. Try to import
+    raise Exception("You misspelled the module name")
+  except AttributeError:
+    pass  #built-in modules don't have __file__
+
+print(" ".join(unique_paths))
+
+EOF
+}
+
+
 main() {
 mkdir -p build/
 gcc -o build/python.so python.c -fPIC -shared -lpython${PYTHON_VERSION}m
@@ -39,6 +67,12 @@ for dir in ${PYTHON_PREFIX_DIR}/lib*/python${PYTHON_VERSION}/
 do
     rsync -a "$dir" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
     --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages'
+done
+
+for i in $(get_paths "${PYTHON_MODULES}")
+do
+    rsync -a "$i" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links \
+    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info'
 done
 
 SHLIBS_COUNT4=`install_shlibs`
