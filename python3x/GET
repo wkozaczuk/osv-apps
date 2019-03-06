@@ -57,7 +57,7 @@ then
 fi
 
 #replace sqlite with a non-MREMAP version
-rsync -a $BASEDIR/../sqlite/libsqlite3.so.0 $ROOTFS/usr/lib/libsqlite3.so.0
+cp $BASEDIR/../sqlite/libsqlite3.so.0 $ROOTFS/usr/lib/libsqlite3.so.0
 }
 
 main
