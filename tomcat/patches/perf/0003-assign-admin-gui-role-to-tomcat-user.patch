@@ -13,12 +13,12 @@ diff --git a/conf/tomcat-users.xml b/conf/tomcat-users.xml
 index 2f9579c..bcf840a 100644
 --- a/conf/tomcat-users.xml
 +++ b/conf/tomcat-users.xml
-@@ -27,5 +27,5 @@
-   <!.. ..> that surrounds them.
+@@ -41,5 +41,5 @@
+   <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+   <user username="role1" password="<must-be-changed>" roles="role1"/>
  -->
-   <role rolename="tomcat"/>
--  <user username="tomcat" password="tomcat" roles="manager-gui"/>
-+  <user username="tomcat" password="tomcat" roles="manager-gui,admin-gui"/>
+-<user username="tomcat" password="tomcat" roles="manager-gui"/>
++<user username="tomcat" password="tomcat" roles="manager-gui,admin-gui"/>
  </tomcat-users>
 -- 
 1.8.1.2
