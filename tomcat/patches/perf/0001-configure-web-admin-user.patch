@@ -13,18 +13,11 @@ diff --git a/conf/tomcat-users.xml b/conf/tomcat-users.xml
 index 7f022ff..2f9579c 100644
 --- a/conf/tomcat-users.xml
 +++ b/conf/tomcat-users.xml
-@@ -26,11 +26,6 @@
-   and thus are ignored when reading this file. Do not forget to remove
-   <!.. ..> that surrounds them.
+@@ -41,4 +41,5 @@
+   <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+   <user username="role1" password="<must-be-changed>" roles="role1"/>
  -->
--<!--
-   <role rolename="tomcat"/>
--  <role rolename="role1"/>
--  <user username="tomcat" password="tomcat" roles="tomcat"/>
--  <user username="both" password="tomcat" roles="tomcat,role1"/>
--  <user username="role1" password="tomcat" roles="role1"/>
---->
-+  <user username="tomcat" password="tomcat" roles="manager-gui"/>
++<user username="tomcat" password="tomcat" roles="manager-gui"/>
  </tomcat-users>
 -- 
 1.8.1.2
