@@ -1,31 +1,33 @@
 #!/usr/bin/env bash
 set -e
-MAJOR=8
-VERSION=${MAJOR}.0.15
+MAJOR=9
+VERSION=${MAJOR}.0.16
 
 dir=apache-tomcat-$VERSION
 archive=$dir.tar.gz
 
 mkdir -p upstream
 pushd upstream
+
 wget -c http://archive.apache.org/dist/tomcat/tomcat-${MAJOR}/v${VERSION}/bin/${archive}
-wget -c http://archive.apache.org/dist/tomcat/tomcat-${MAJOR}/v${VERSION}/bin/${archive}.md5
-if [ "$(md5sum -c ${archive}.md5)" != "${archive}: OK" ];
+wget -c http://archive.apache.org/dist/tomcat/tomcat-${MAJOR}/v${VERSION}/bin/${archive}.sha512
+
+if [ "$(sha512sum -c ${archive}.sha512)" != "${archive}: OK" ];
 then
-    echo "Aborting: invalid md5 for Apache Tomcat $VERSION"
+    echo "Aborting: invalid sha512 for Apache Tomcat $VERSION"
     exit 1
 fi
+
 tar zxvf $archive
 
 pushd $dir
-for p in $(find ../../patches/perf/ -name '*.patch' | sort); do
-    echo "Applying $p"
-    patch -p1 < $p
+for patch in $(find ../../patches/perf/ -name '*.patch' | sort); do
+    echo "Applying $patch"
+    patch -p1 < "$patch"
 done
 popd
 
 popd
-
 
 mkdir ROOTFS
 mkdir -p ROOTFS/usr/tomcat
