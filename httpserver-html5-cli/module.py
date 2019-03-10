@@ -7,13 +7,13 @@ _app = '${OSV_BASE}/apps/httpserver-html5-cli'
 
 usr_files = FileMap()
 usr_files.add(os.path.join(_app, 'osv-html5-terminal/dist')).to('/usr/mgmt/cli')
-usr_files.add(os.path.join(_app, 'httpserver.conf')).to('/tmp/httpserver.conf')
+usr_files.add(os.path.join(_app, 'httpserver.conf')).to('/etc/httpserver.conf')
 
 api.require('httpserver-api')
 
 # httpserver will run regardless of an explicit command line
 # passed with "run.py -e".
-_exe = '/libhttpserver-api.so'
+_exe = '/libhttpserver-api.so --config-file=/etc/httpserver.conf'
 daemon = api.run_on_init(_exe + ' &!')
 
 fg = api.run(_exe)
