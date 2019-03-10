@@ -1,4 +1,14 @@
+# Directories storing files downloaded or collected from the OS
 upstream
 src
 ROOTFS
 install
+
+# Downloaded compressed archives
+*.tar.gz
+
+# Terminal settings from the host
+unknown-term/terminfo
+
+# Unpacked mysql releases
+mysql/mysql-*
