@@ -1,3 +1,3 @@
 from osv.modules import api
 
-default = api.run("/tools/sqlite.so test.db")
+default = api.run("/usr/lib/libsqlite3.so.0 test.db")

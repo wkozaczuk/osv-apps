@@ -6,4 +6,4 @@ upstream:
 
 .PHONY: clean
 clean:
-	rm -rf upstream *.so
+	rm -rf upstream *.so *.so.0
