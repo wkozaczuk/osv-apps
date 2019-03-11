@@ -66,7 +66,7 @@ install_shlibs
 for dir in ${PYTHON_PREFIX_DIR}/lib*/python${PYTHON_VERSION}/
 do
     rsync -a "$dir" $ROOTFS/lib/python${PYTHON_VERSION}/ --safe-links --exclude test --exclude unittest \
-    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages'
+    --exclude '*.pyc' --exclude '*.pyo' --exclude '*.egg-info' --exclude 'site-packages' --exclude 'dist-packages' --exclude '*.a'
 done
 
 for i in $(get_paths "${PYTHON_MODULES}")
