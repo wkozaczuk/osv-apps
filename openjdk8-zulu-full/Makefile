@@ -8,6 +8,7 @@
 jvm_dir=install/usr/lib/jvm
 
 java8_jdk_tarball_url = $(shell ./latest.sh)
+java8_jdk_tarball = $(notdir $(java8_jdk_tarball_url))
 
 java8_name = $(shell echo $(java8_jdk_tarball_url) | grep -o zulu8.*x64)
 
@@ -15,10 +16,10 @@ SRC = $(shell readlink -f ../..)
 
 module:
 	mkdir -p upstream
-	wget -c -O upstream/openjdk8.tar.gz $(java8_jdk_tarball_url)
+	wget -c -O upstream/$(java8_jdk_tarball) $(java8_jdk_tarball_url)
 	rm -rf install
 	mkdir -p $(jvm_dir)/java
-	cd install && tar xfz ../upstream/openjdk8.tar.gz
+	cd install && tar xfz ../upstream/$(java8_jdk_tarball)
 	mv install/$(java8_name)/jre $(jvm_dir)/java/jre
 	rm -rf install/$(java8_name)
 	rm -rf $(jvm_dir)/java/jre/bin
