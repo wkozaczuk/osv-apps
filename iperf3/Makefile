@@ -17,7 +17,7 @@ iperf3: $(iperfv)/src/.libs/iperf3
 
 $(iperfv)/src/.libs/iperf3: $(tarball)
 	tar xzf $^
-	cd $(iperfv) && CFLAGS='-fPIC -g' CXXFLAGS='-fPIC -g' ./configure --with-openssl=no
+	cd $(iperfv) && CFLAGS='-fpie -g' CXXFLAGS='-fpie -g' LDFLAGS='-pie' ./configure --with-openssl=no
 	+$(MAKE) -C $(iperfv)
 
 $(tarball):
