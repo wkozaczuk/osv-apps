@@ -1,2 +1,1 @@
-/main.so: ${MODULE_DIR}/main.so
-/libhello.so: ${MODULE_DIR}/libhello.so
+/hello: ${MODULE_DIR}/hello

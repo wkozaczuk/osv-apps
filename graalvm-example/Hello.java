@@ -1,15 +1,21 @@
-//
-// Copyright (C) 2018 Waldek Kozaczuk
-//
-// This work is open source software, licensed under the terms of the
-// BSD license as described in the LICENSE file in the top-level directory.
-//
-import org.graalvm.nativeimage.IsolateThread;
-import org.graalvm.nativeimage.c.function.CEntryPoint;
+import java.lang.management.ManagementFactory;
+
+import org.graalvm.nativeimage.*;
+import org.graalvm.nativeimage.Isolates.CreateIsolateParameters;
 
 public class Hello {
-    @CEntryPoint(name = "graal_main")
-    public static void main(IsolateThread thread) {
+    public static void main(String[] args) {
         System.out.println("Hello, World from GraalVM on OSv!");
+
+        /* Create a new isolate for the next function evaluation. */
+        IsolateThread newContext = Isolates.createIsolate(CreateIsolateParameters.getDefault());
+
+        System.out.println("Hello, World from GraalVM on OSv from an isolate!");
+
+        /* Tear down the isolate, freeing all the temporary objects. */
+        Isolates.tearDownIsolate(newContext);
+
+        long currentMemory = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+        System.out.println("Memory usage: " + currentMemory / 1024 + " KByte" );
     }
 }

@@ -1,20 +1,20 @@
-module: main.so
+module: hello
 
-CFLAGS = -std=gnu99 -fPIC -rdynamic
+GRAAL_VERSION=19.1.0
 
-main.so: libhello.so main.c
-	$(CC) -pie -o $@ $(CFLAGS) -I. main.c -L. -lhello -ldl
+Hello.class: Hello.java upstream/graalvm-ce-$(GRAAL_VERSION)
+	upstream/graalvm-ce-$(GRAAL_VERSION)/bin/javac -d . Hello.java
 
-Hello.class: Hello.java upstream/graalvm-ce-1.0.0-rc12
-	upstream/graalvm-ce-1.0.0-rc12/bin/javac -d . Hello.java
+hello: Hello.class upstream/graalvm-ce-$(GRAAL_VERSION)/bin/native-image
+	upstream/graalvm-ce-$(GRAAL_VERSION)/bin/native-image --no-server Hello
 
-libhello.so: Hello.class upstream/graalvm-ce-1.0.0-rc12
-	upstream/graalvm-ce-1.0.0-rc12/bin/native-image --no-server --shared -H:Name=libhello
-
-upstream/graalvm-ce-1.0.0-rc12:
+upstream/graalvm-ce-$(GRAAL_VERSION):
 	mkdir -p upstream
-	wget -c -O upstream/graalvm.tar.gz https://github.com/oracle/graal/releases/download/vm-1.0.0-rc12/graalvm-ce-1.0.0-rc12-linux-amd64.tar.gz
-	cd upstream && tar xf graalvm.tar.gz
+	wget -c -O upstream/graalvm-ce-linux-amd64-$(GRAAL_VERSION).tar.gz https://github.com/oracle/graal/releases/download/vm-$(GRAAL_VERSION)/graalvm-ce-linux-amd64-$(GRAAL_VERSION).tar.gz
+	cd upstream && tar xf graalvm-ce-linux-amd64-$(GRAAL_VERSION).tar.gz
+
+upstream/graalvm-ce-$(GRAAL_VERSION)/bin/native-image: upstream/graalvm-ce-$(GRAAL_VERSION)
+	cd upstream/graalvm-ce-$(GRAAL_VERSION) && ./bin/gu install native-image && touch ./bin/native-image
 
 clean:
-	rm -rf *.class libhello* main*.so graal*.h upstream
+	rm -rf *.class hello upstream
