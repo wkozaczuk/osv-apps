@@ -14,18 +14,19 @@ java8_name = $(shell echo $(java8_jdk_tarball_url) | grep -o zulu8.*x64)
 
 SRC = $(shell readlink -f ../..)
 
-module:
-	mkdir -p upstream
-	wget -c -O upstream/$(java8_jdk_tarball) $(java8_jdk_tarball_url)
+module: upstream/$(java8_jdk_tarball)
 	rm -rf install
 	mkdir -p $(jvm_dir)/java
 	cd install && tar xfz ../upstream/$(java8_jdk_tarball)
 	mv install/$(java8_name)/jre $(jvm_dir)/java/jre
 	rm -rf install/$(java8_name)
-	rm -rf $(jvm_dir)/java/jre/bin
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
 	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/jre/lib/security/
+
+upstream/$(java8_jdk_tarball):
+	mkdir -p upstream
+	wget -c -O upstream/$(java8_jdk_tarball) $(java8_jdk_tarball_url)
 
 clean:
 	rm -rf upstream install

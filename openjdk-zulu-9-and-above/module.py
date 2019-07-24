@@ -9,10 +9,10 @@ from osv.modules.filemap import FileMap
 from osv.modules import api
 
 api.require('java-non-isolated')
-provides = ['java','java8','java9','java10']
+provides = ['java','java8','java9', 'java10', 'java11', 'java12']
 
 usr_files = FileMap()
-usr_files.add('${OSV_BASE}/apps/openjdk10-zulu-java-base/install').to('/').allow_symlink()
-usr_files.add('${OSV_BASE}/apps/openjdk10-zulu-java-base/install/usr/lib/jvm/java') \
+usr_files.add('${OSV_BASE}/apps/openjdk-zulu-9-and-above/install').to('/').allow_symlink()
+usr_files.add('${OSV_BASE}/apps/openjdk-zulu-9-and-above/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
