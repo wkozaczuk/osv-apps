@@ -4,3 +4,4 @@
 /jetty/lib/**: ${MODULE_DIR}/upstream/lib/**
 /jetty/etc/**: ${MODULE_DIR}/upstream/etc/**
 /jetty/modules/**: ${MODULE_DIR}/upstream/modules/**
+/etc/**: ${MODULE_DIR}/upstream/demo-base/etc/**
