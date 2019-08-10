@@ -16,3 +16,4 @@ usr_files.add('${OSV_BASE}/apps/openjdk8-zulu-compact3-with-java-beans/install/u
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
 usr_files.link('/usr/lib/jvm/jre').to('/usr/lib/jvm/java/jre')
+usr_files.link('/usr/bin/java').to('/usr/lib/jvm/java/jre/bin/java')

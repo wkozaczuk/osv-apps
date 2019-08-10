@@ -16,3 +16,4 @@ usr_files.add('${OSV_BASE}/apps/openjdk-zulu-9-and-above/install').to('/').allow
 usr_files.add('${OSV_BASE}/apps/openjdk-zulu-9-and-above/install/usr/lib/jvm/java') \
     .to('/usr/lib/jvm/java') \
     .allow_symlink()
+usr_files.link('/usr/bin/java').to('/usr/lib/jvm/java/bin/java')
