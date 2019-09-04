@@ -6,7 +6,7 @@
 #
 
 SRCDIR=upstream
-VERSION=4.0.2
+VERSION=4.2
 DOWNLOAD_URL=https://www.ffmpeg.org/releases/
 TARBALL=ffmpeg-${VERSION}.tar.xz
 module: ROOTFS/ffmpeg.so
@@ -17,10 +17,26 @@ ${SRCDIR}/ffmpeg-${VERSION}:
 	cd upstream && tar xf ${TARBALL}
 
 ${SRCDIR}/ffmpeg-${VERSION}/ffmpeg: ${SRCDIR}/ffmpeg-${VERSION}
-	# If needs x265 codex
-	# sudo apt-get install libx265-dev
-	cd ${SRCDIR}/ffmpeg-${VERSION} && ./configure --disable-static --enable-shared --disable-ffplay --disable-ffprobe
-#		--enable-libx265 --enable-gpl -> uncomment to enable x265 codec
+	# If needs x264 and x265 codex
+	# sudo apt-get install libx264-dev libx265-dev
+	cd ${SRCDIR}/ffmpeg-${VERSION} && ./configure --disable-all \
+	--enable-ffmpeg \
+	--enable-small \
+	--enable-avcodec \
+	--enable-avformat \
+	--enable-avfilter \
+	--enable-swresample \
+	--enable-swscale \
+	--enable-decoder=h264,h265 \
+	--enable-encoder=rawvideo,libx264,libx265,png \
+	--enable-parser=h264,h265 \
+	--enable-protocol=file,http \
+	--enable-demuxer=mov \
+	--enable-muxer=rawvideo,mp4,mpegts,image2 \
+	--enable-filter=scale \
+	--enable-libx264 \
+	--enable-libx265 \
+	--enable-gpl
 	patch ${SRCDIR}/ffmpeg-${VERSION}/fftools/ffmpeg.c fftools_ffmpeg.patch
 	cd ${SRCDIR}/ffmpeg-${VERSION} && make
 	cd ${SRCDIR}/ffmpeg-${VERSION} && rm ffmpeg ffmpeg_g fftools/*.o fftools/*.d
@@ -32,7 +48,7 @@ ROOTFS/ffmpeg.so: ${SRCDIR}/ffmpeg-${VERSION}/ffmpeg
 	cp ${SRCDIR}/ffmpeg-${VERSION}/ffmpeg ROOTFS/ffmpeg.so
 	find ${SRCDIR}/ffmpeg-${VERSION} -regex '.*\.so\.[0-9]+' | xargs -I {} cp {} ROOTFS/
 	ldd ROOTFS/*.so* | grep -Po '(?<=> )/[^ ]+' | sort | uniq | grep -Pv 'lib(c|gcc_s|dl|m|util|rt|pthread|stdc\+\+|selinux|krb5|gssapi_krb5|z|bz2)\.so' | xargs -I {} install {} ROOTFS/usr/lib
-	strip ROOTFS/* && strip ROOTFS/usr/lib/*
+	strip ROOTFS/ffmpeg.so && strip ROOTFS/usr/lib/*so*
 
 clean:
 	rm -rf upstream ROOTFS
