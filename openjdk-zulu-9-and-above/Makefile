@@ -12,7 +12,7 @@ JAVA_PROFILE ?= normal
 
 minimal_profile_modules = "java.base,jdk.unsupported"
 # Add java.xml.bind to run spring boot
-normal_profile_modules = "java.base,java.sql,java.logging,java.xml,jdk.unsupported,java.sql,java.naming,java.desktop,java.management,java.security.jgss,java.instrument"
+normal_profile_modules = "java.base,java.sql,java.logging,java.xml,jdk.unsupported,java.sql,java.naming,java.desktop,java.management,java.security.jgss,java.instrument,java.rmi"
 
 profile_modules = $($(JAVA_PROFILE)_profile_modules)
 
@@ -34,6 +34,14 @@ module: upstream/$(java_fullname)
 	ln -sf $(jre_name) $(jvm_dir)/java
 	rm -rf $(jvm_dir)/java/lib/security/cacerts
 	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/lib/security/
+	mkdir -p mpm
+	echo "name: osv.openjdk$(JAVA_VERSION)-zulu" > mpm/package.yaml
+	printf "title: " >> mpm/package.yaml
+	echo "Zulu Open JDK $(JAVA_VERSION)" >> mpm/package.yaml
+	printf "version: " >> mpm/package.yaml
+	install/usr/lib/jvm/java/bin/java --version 2>&1 | grep "openjdk" | grep -oP "1[^\"]+" >> mpm/package.yaml
+	echo "require:" >> mpm/package.yaml
+	echo "- osv.libz" >> mpm/package.yaml
 
 upstream/$(java_fullname):
 	mkdir -p upstream
