@@ -1,5 +1,5 @@
 
-SOURCE=http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.45.tar.xz
+SOURCE=http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.54.tar.xz
 
 .PHONY: module clean
 
@@ -18,7 +18,7 @@ usr.manifest: $(SRC)/lighttpd.so
 	echo '/lighttpd/lighttpd.conf: $${MODULE_DIR}/lighttpd.conf' >> usr.manifest
 
 clean:
-	rm -fr upstream 
+	rm -fr upstream lib
 	rm -f upstream.tar usr.manifest
 
 # Note: the touch commands below are needed after commands which create files
