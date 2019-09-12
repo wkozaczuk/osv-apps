@@ -7,6 +7,7 @@ all: module
 module: spring-boot-example
 
 module: upstream/spring-boot-examples/.git
+	cp pom.xml $(app-dir)/$(example-dir)/pom.xml
 	cd $(app-dir)/$(example-dir) && mvn package
 	echo "/$(example).jar : $(app-dir)/$(example-dir)/target/$(example)-0.0.1-SNAPSHOT.jar" > $(app-dir)/usr.manifest
 
