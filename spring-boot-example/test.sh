@@ -1,12 +1,12 @@
 #!/bin/bash
 
 THIS_DIR=$(readlink -f $(dirname $0))
-CMDLINE=$($THIS_DIR/../cmdline.sh $THIS_DIR)
+CMDLINE=$($THIS_DIR/../cmdline.sh $THIS_DIR 'native')
 
 $THIS_DIR/../../scripts/tests/test_http_app_with_curl_and_ab.py \
-  -e "/nginx.so -c /nginx/conf/nginx.conf" \
   -e "$CMDLINE" \
-  --guest_port 80 \
-  --host_port 8000 \
-  --line 'initgroups' \
-  --http_line 'Welcome to nginx'
+  --guest_port 8080 \
+  --host_port 8080 \
+  --line 'Started SpringBoot2RestServiceApplication' \
+  --http_line 'passportNumber' \
+  --http_path '/students'

@@ -1,3 +1,6 @@
-sysbench /usr/share/sysbench/oltp_read_write.lua --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=admin --mysql-password=osv --mysql-db=test --db-driver=mysql --tables=3 --table-size=1000000 prepare
+#!/bin/bash
+sysbench /usr/share/sysbench/oltp_read_write.lua --mysql-host=192.168.122.76 --mysql-port=3306 --mysql-user=admin --mysql-password=osv --mysql-db=test --db-driver=mysql --tables=3 --table-size=100000 prepare
 
-sysbench /usr/share/sysbench/oltp_read_write.lua --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=admin --mysql-password='osv' --mysql-db=test --db-driver=mysql --tables=3 --table-size=1000000 --report-interval=10 --threads=12 --time=60 run 2>&1
+sleep 1
+
+sysbench /usr/share/sysbench/oltp_read_write.lua --mysql-host=192.168.122.76 --mysql-port=3306 --mysql-user=admin --mysql-password='osv' --mysql-db=test --db-driver=mysql --tables=3 --table-size=100000 --report-interval=10 --threads=12 --time=60 run 2>&1
