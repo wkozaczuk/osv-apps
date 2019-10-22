@@ -1,11 +1,7 @@
 #!/bin/bash
 
 APP_DIR=$1
-
-CMD=$2
-if [ "$CMD" == "" ]; then
-  CMD="default"
-fi
+CMD=${2:-'default'}
 
 THIS_DIR=$(readlink -f $(dirname $0))
 export OSV_BASE=$THIS_DIR/..
