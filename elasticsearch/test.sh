@@ -13,4 +13,5 @@ $THIS_DIR/../../scripts/tests/test_http_app_with_curl_and_ab.py \
   --http_path '/library/_search?q=author:frank' \
   --concurrency 50 \
   --count 1000 \
-  --no_keep_alive
+  --no_keep_alive \
+  --error_line_to_ignore_on_kill "mainWithoutErrorHandling"
