@@ -4,7 +4,7 @@ DIR:=$(NAME)-$(VERSION)
 TARBALL:=elasticsearch-$(VERSION)-linux-x86_64.tar.gz
 URL:=https://artifacts.elastic.co/downloads/elasticsearch/$(TARBALL)
 
-module: ROOTFS ROOTFS/$(NAME)/lib/elasticsearch-$(VERSION).jar ROOTFS/$(NAME)/java/bin/java usr.manifest
+module: ROOTFS/$(NAME) ROOTFS/$(NAME)/java/bin/java usr.manifest
 
 $(TARBALL):
 	wget -c $(URL)
@@ -16,6 +16,7 @@ ROOTFS/$(NAME): $(TARBALL)
 	cd ROOTFS/$(NAME) && rm -rf modules/x-pack-ml && rm -rf modules/ingest-geoip && rm -rf modules/x-pack-security
 	touch ROOTFS/$(NAME)
 	find ./assets/config -type f -exec cp {} ROOTFS/$(NAME)/config/. \;
+	./patch_no_root_check.sh $(VERSION)
 
 usr.manifest:
 	echo "/$(NAME)/**: \$${MODULE_DIR}/ROOTFS/$(NAME)/**" > usr.manifest
@@ -24,11 +25,7 @@ clean:
 	rm -rf ROOTFS $(DIR)
 	rm -f usr.manifest $(TARBALL)
 
-ROOTFS/$(NAME)/lib/elasticsearch-$(VERSION).jar: $(TARBALL)
-	./patch_no_root_check.sh $(VERSION)
-	touch ROOTFS/$(NAME)/lib/elasticsearch-$(VERSION).jar
-
-ROOTFS/$(NAME)/java/bin/java:
+ROOTFS/$(NAME)/java/bin/java: ROOTFS/$(NAME)
 	ROOTFS/$(NAME)/jdk/bin/jdeps --multi-release 12 --ignore-missing-deps --list-deps ROOTFS/$(NAME)/lib/* | grep -v found | grep -o java.* > /tmp/mods
 	ROOTFS/$(NAME)/jdk/bin/jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules $$(echo $$(cat /tmp/mods) | sed 's/ /,/g'),jdk.unsupported,jdk.crypto.cryptoki --output ROOTFS/$(NAME)/java
 	rm -rf ROOTFS/$(NAME)/jdk
