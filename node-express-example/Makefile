@@ -8,6 +8,7 @@ ROOTFS/express:
 	mkdir -p ROOTFS
 	git clone git://github.com/strongloop/express.git --depth 1 ROOTFS/express
 	cd ROOTFS/express && npm install
+	rm -rf ROOTFS/express/test
 test:
 	python test.py
 clean:
