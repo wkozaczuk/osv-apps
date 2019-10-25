@@ -9,6 +9,7 @@ upstream/KeyDB/src/keydb-server: upstream/KeyDB/.git
 
 module: upstream/KeyDB/src/keydb-server
 	$(SRC)/scripts/manifest_from_host.sh upstream/KeyDB/src/keydb-server > usr.manifest
+	strip upstream/KeyDB/src/keydb-server
 
 clean:
 	rm -rf upstream
