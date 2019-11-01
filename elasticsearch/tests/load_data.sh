@@ -1,5 +1,5 @@
 #!/bin/bash
-curl -X PUT "localhost:9200/library/book/_bulk?refresh&pretty" -H 'Content-Type: application/json' -d'
+curl -X PUT "$OSV_HOSTNAME:9200/library/book/_bulk?refresh&pretty" -H 'Content-Type: application/json' -d'
 {"index":{"_id": "Leviathan Wakes"}}
 {"name": "Leviathan Wakes", "author": "James S.A. Corey", "release_date": "2011-06-02", "page_count": 561}
 {"index":{"_id": "Hyperion"}}
