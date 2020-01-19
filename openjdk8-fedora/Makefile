@@ -33,6 +33,10 @@ nss_fullname=nss-$(nss_version).x86_64.rpm
 nss-util_version=$(shell ./latest.sh nss-util x86_64)
 nss-util_dir=http://mirrors.kernel.org/fedora/development/rawhide/Everything/x86_64/os/Packages/n/
 nss-util_fullname=nss-util-$(nss-util_version).x86_64.rpm
+# "nss-softokn-freebl" package provides libfreeblpriv3.so
+nss-softokn-freebl_version=$(shell ./latest.sh nss-softokn-freebl x86_64)
+nss-softokn-freebl_dir=http://mirrors.kernel.org/fedora/development/rawhide/Everything/x86_64/os/Packages/n/
+nss-softokn-freebl_fullname=nss-softokn-freebl-$(nss-softokn-freebl_version).x86_64.rpm
 
 # More needed libraries by the JRE's libjavalcms.so - see issue #601
 # "lcms2" package provides liblcms2.so
@@ -50,22 +54,24 @@ module:
 	wget -c -O upstream/$(nspr_fullname) $(nspr_dir)$(nspr_fullname)
 	wget -c -O upstream/$(nss_fullname) $(nss_dir)$(nss_fullname)
 	wget -c -O upstream/$(nss-util_fullname) $(nss-util_dir)$(nss-util_fullname)
+	wget -c -O upstream/$(nss-softokn-freebl_fullname) $(nss-softokn-freebl_dir)$(nss-softokn-freebl_fullname)
 	wget -c -O upstream/$(lcms2_fullname) $(lcms2_dir)$(lcms2_fullname)
 	rm -rf install
 	mkdir -p install/usr
 	ln -s lib install/usr/lib64
-	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id)
+	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id --extract-over-symlinks)
 	# Move the versioned java directory to the generic "java" name, but
 	# keep a link at the versioned name:
 	mv $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64 $(jvm_dir)/java
 	ln -sf java $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
-	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id)
-	rpm2cpio upstream/$(nspr_fullname) | (cd install && cpio -id)
-	rpm2cpio upstream/$(nss_fullname) | (cd install && cpio -id)
-	rpm2cpio upstream/$(nss-util_fullname) | (cd install && cpio -id)
-	rpm2cpio upstream/$(lcms2_fullname) | (cd install && cpio -id)
+	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(nspr_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(nss_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(nss-util_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(nss-softokn-freebl_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(lcms2_fullname) | (cd install && cpio -id --extract-over-symlinks)
 	rm -rf install/usr/share/man
 	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/jre/lib/security/
 
