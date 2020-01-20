@@ -47,6 +47,8 @@ lcms2_fullname=lcms2-$(lcms2_version).x86_64.rpm
 
 SRC = $(shell readlink -f ../..)
 
+cpio_extract_option = $(shell cpio --help | grep -o '\-\-extract-over-symlinks')
+
 module:
 	mkdir -p upstream
 	wget -c -O upstream/$(java_fullname) $(java_dir)$(java_fullname)
@@ -59,19 +61,19 @@ module:
 	rm -rf install
 	mkdir -p install/usr
 	ln -s lib install/usr/lib64
-	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(java_fullname) | (cd install && cpio -id $(cpio_extract_option))
 	# Move the versioned java directory to the generic "java" name, but
 	# keep a link at the versioned name:
 	mv $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64 $(jvm_dir)/java
 	ln -sf java $(jvm_dir)/java-1.8.0-openjdk-$(java_version).x86_64
 	rm -rf $(jvm_dir)/java/jre/lib/security/cacerts
 	rm -rf $(jvm_dir)/java/jre/lib/audio/*
-	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id --extract-over-symlinks)
-	rpm2cpio upstream/$(nspr_fullname) | (cd install && cpio -id --extract-over-symlinks)
-	rpm2cpio upstream/$(nss_fullname) | (cd install && cpio -id --extract-over-symlinks)
-	rpm2cpio upstream/$(nss-util_fullname) | (cd install && cpio -id --extract-over-symlinks)
-	rpm2cpio upstream/$(nss-softokn-freebl_fullname) | (cd install && cpio -id --extract-over-symlinks)
-	rpm2cpio upstream/$(lcms2_fullname) | (cd install && cpio -id --extract-over-symlinks)
+	rpm2cpio upstream/$(tzdata_fullname) | (cd install && cpio -id $(cpio_extract_option))
+	rpm2cpio upstream/$(nspr_fullname) | (cd install && cpio -id $(cpio_extract_option))
+	rpm2cpio upstream/$(nss_fullname) | (cd install && cpio -id $(cpio_extract_option))
+	rpm2cpio upstream/$(nss-util_fullname) | (cd install && cpio -id $(cpio_extract_option))
+	rpm2cpio upstream/$(nss-softokn-freebl_fullname) | (cd install && cpio -id $(cpio_extract_option))
+	rpm2cpio upstream/$(lcms2_fullname) | (cd install && cpio -id $(cpio_extract_option))
 	rm -rf install/usr/share/man
 	ln -s /etc/pki/java/cacerts install/usr/lib/jvm/java/jre/lib/security/
 
