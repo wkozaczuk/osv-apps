@@ -1,0 +1,11 @@
+--- a/upstream/KeyDB/src/server.cpp
++++ b/upstream/KeyDB/src/server.cpp
+@@ -5232,7 +5232,7 @@ int main(int argc, char **argv) {
+     initNetworking(cserver.cthreads > 1 /* fReusePort */);
+ 
+     if (background || cserver.pidfile) createPidFile();
+-    redisSetProcTitle(argv[0]);
++    //redisSetProcTitle(argv[0]);
+     redisAsciiArt();
+     checkTcpBacklogSettings();
+ 

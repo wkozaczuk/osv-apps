@@ -1,7 +1,0 @@
-# (PIE) Position Independent Executable
-/keydb-server: /home/wkozaczuk/projects/osv/apps/keydb/upstream/KeyDB/src/keydb-server
-# --------------------
-# Dependencies
-# --------------------
-/usr/lib/libuuid.so.1: /lib/x86_64-linux-gnu/libuuid.so.1
-# --------------------
