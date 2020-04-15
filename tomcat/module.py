@@ -4,7 +4,7 @@ api.require('java8')
 
 _catalina_base = "/usr/tomcat"
 _catalina_home = _catalina_base
-_catalina_tmpdir = _catalina_base + "/temp"
+_catalina_tmpdir = "/tmp/catalina"
 
 _classpath = [_catalina_home + "/bin/bootstrap.jar"]
 
