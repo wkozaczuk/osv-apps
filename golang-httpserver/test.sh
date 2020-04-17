@@ -3,7 +3,7 @@
 THIS_DIR=$(readlink -f $(dirname $0))
 CMDLINE=$($THIS_DIR/../cmdline.sh $THIS_DIR)
 
-$THIS_DIR/../../scripts/tests/test_http_app_with_curl_and_ab.py \
+$THIS_DIR/../../scripts/tests/test_http_app.py \
   -e "$CMDLINE" \
   --guest_port 8000 \
   --host_port 8000 \
